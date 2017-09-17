@@ -1,3 +1,8 @@
+; fluid_solver
+%define offset_N 0
+%define offset_u 16
+%define offset_v 24
+
 section .text
 
 global solver_lin_solve
