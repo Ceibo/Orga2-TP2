@@ -101,7 +101,6 @@ void solver_advect ( fluid_solver* solver, uint32_t b, float * d, float * d0, fl
 }
 
 /* SIMD IMPLEMENTATION */
-/*
 void solver_lin_solve ( fluid_solver* solver, uint32_t b, float * x, float * x0, float a, float c ){
 	uint32_t i, j, k;
 	for ( k=0 ; k<20 ; k++ ) {
@@ -115,11 +114,28 @@ void solver_lin_solve ( fluid_solver* solver, uint32_t b, float * x, float * x0,
 void solver_set_bnd ( fluid_solver* solver, uint32_t b, float * x ){
 	uint32_t i;
 	uint32_t N = solver->N;
-	for ( i=1 ; i<=N ; i++ ) {
-		x[IX(0  ,i)] = b==1 ? -x[IX(1,i)] : x[IX(1,i)];
-		x[IX(N+1,i)] = b==1 ? -x[IX(N,i)] : x[IX(N,i)];
-		x[IX(i,0  )] = b==2 ? -x[IX(i,1)] : x[IX(i,1)];
-		x[IX(i,N+1)] = b==2 ? -x[IX(i,N)] : x[IX(i,N)];
+	for ( i=N ; i>=1 ; --i ) {
+		x[IX(0  ,i)] = (b==1 ? -1 : 1) * x[IX(1,i)];
+		x[IX(N+1,i)] = (b==1 ? -1 : 1) * x[IX(N,i)];
+		x[IX(i,0  )] = (b==2 ? -1 : 1) * x[IX(i,1)];
+		x[IX(i,N+1)] = (b==2 ? -1 : 1) * x[IX(i,N)];
+
+    if (b==1) {
+      x[IX(0  ,i)] = -x[IX(1,i)];
+      x[IX(N+1,i)] = -x[IX(N,i)];
+      x[IX(i,0  )] = x[IX(i,1)];
+      x[IX(i,N+1)] = x[IX(i,N)];
+    } else if (b==2) {
+      x[IX(0  ,i)] = x[IX(1,i)];
+      x[IX(N+1,i)] = x[IX(N,i)];
+      x[IX(i,0  )] = -x[IX(i,1)];
+      x[IX(i,N+1)] = -x[IX(i,N)];
+    } else {
+      x[IX(0  ,i)] = x[IX(1,i)];
+      x[IX(N+1,i)] = x[IX(N,i)];
+      x[IX(i,0  )] = x[IX(i,1)];
+      x[IX(i,N+1)] = x[IX(i,N)];
+    }
 	}
 	x[IX(0  ,0  )] = 0.5f*(x[IX(1,0  )]+x[IX(0  ,1)]);
 	x[IX(0  ,N+1)] = 0.5f*(x[IX(1,N+1)]+x[IX(0  ,N)]);
@@ -141,4 +157,3 @@ void solver_project ( fluid_solver* solver, float * p, float * div ){
 	END_FOR
 	solver_set_bnd ( solver, 1, solver->u ); solver_set_bnd ( solver, 2, solver->v );
 }
-*/
