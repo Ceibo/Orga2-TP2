@@ -119,23 +119,6 @@ void solver_set_bnd ( fluid_solver* solver, uint32_t b, float * x ){
 		x[IX(N+1,i)] = (b==1 ? -1 : 1) * x[IX(N,i)];
 		x[IX(i,0  )] = (b==2 ? -1 : 1) * x[IX(i,1)];
 		x[IX(i,N+1)] = (b==2 ? -1 : 1) * x[IX(i,N)];
-
-    if (b==1) {
-      x[IX(0  ,i)] = -x[IX(1,i)];
-      x[IX(N+1,i)] = -x[IX(N,i)];
-      x[IX(i,0  )] = x[IX(i,1)];
-      x[IX(i,N+1)] = x[IX(i,N)];
-    } else if (b==2) {
-      x[IX(0  ,i)] = x[IX(1,i)];
-      x[IX(N+1,i)] = x[IX(N,i)];
-      x[IX(i,0  )] = -x[IX(i,1)];
-      x[IX(i,N+1)] = -x[IX(i,N)];
-    } else {
-      x[IX(0  ,i)] = x[IX(1,i)];
-      x[IX(N+1,i)] = x[IX(N,i)];
-      x[IX(i,0  )] = x[IX(i,1)];
-      x[IX(i,N+1)] = x[IX(i,N)];
-    }
 	}
 	x[IX(0  ,0  )] = 0.5f*(x[IX(1,0  )]+x[IX(0  ,1)]);
 	x[IX(0  ,N+1)] = 0.5f*(x[IX(1,N+1)]+x[IX(0  ,N)]);

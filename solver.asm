@@ -2,6 +2,7 @@
 %define offset_N 0
 %define offset_u 16
 %define offset_v 24
+%define cell_size 16
 
 section .text
 
@@ -23,38 +24,75 @@ solver_set_bnd:
 ; esi = uint32_t b
 ; rdx = float* x
 
-mov ecx, [rdi + offset_N] ; r8d = N
+push r12
+push r13
+push r14
 
-inc rcx             ; rcx = N+1
-mov r8, rcx         ; r8 = N+1
-inc r8              ; r8 = N+2
-shl r8, 4           ; r8 = (N+2)*16
-lea r9, [rdi + r8]  ; r9 apunta al primero de la segunda fila
-mov r11, r8         ; r10 = (N+2)*16
-mul r8, rcx         ; r8 = (N+1)*(N+2)*16
-lea r11, [rdi + r8] ; r11 apunta al primero de la última fila
-dec rcx             ; rcx = N
-mul r10, rcx        ; r10 apunta al primero de la anteúltima fila
+mov ecx, [rdi + offset_N] ; rcx = N
 
+mov 
 
-lea r9, [rdi + r8] ; r9 apunta al primero de la última fila
-mov r8, rdi        ; r8 apunta al primero de la primera fila 
+mov r8, rcx
+add r8, 2 ; r8 = N+2
+mov r14, r8
 
+lea r9, [rdi + cell_size*r8]
 
-; r8 primera fila     ; rdi
+mul r8, rcx ; r8 = (N+2)*N
+
+lea r10, [rdi + cell_size*r8]
+
+add r8, rcx
+add r8, 2 ; r8 = (N+2)*(N+1)
+
+lea r11, [rdi + cell_size*r8]
+
+lea r8, [rdi + 16]
+
+mov r13, r8
+add r13, r14 ; apunta al anteúltimo de la segunda fila
+mov r12, r9  ; apunta al primero de la segunda fila
+
+; r8 primera fila     ; rdi + 16
 ; r9 segunda fila     ; rdi + 16*(N+2)
 ; r10 anteúltima fila ; rdi + 16*(N+2)*(N)
 ; r11 última fila     ; rdi + 16*(N+2)*(N+1)
 
-
-shr ecx, 2 ; proceso de a 4 elementos
+shr ecx, 2
 
 .ciclo:
-  movups xmm0, [r8]
+  movups xmm0, [r9]
+  movups xmm1, [r10]
+  cmp esi, 2
+  jne .end_if_0
+  	call change_sign_of_single_packed_xmm0_and_xmm1
+  .end_if_0:
+  movups [r8], xmm0
+  movups [r11], xmm1
+
+
   
   add r8, 16
+  add r9, 16
+  add r10, 16
+  add r11, 16
 loop .ciclo
 
+pop r14
+pop r13
+pop r12
+ret
+
+change_sign_of_single_packed_xmm0_and_xmm1:
+; supuestamente 0x0 se interpreta como cero en float
+
+movps xmm2, xmm0
+pxor xmm0
+subps xmm0, xmm2
+
+movps xmm2, xmm1
+pxor xmm1
+subps xmm1, xmm2
 ret
 
 global solver_project
