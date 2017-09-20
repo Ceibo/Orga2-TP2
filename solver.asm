@@ -2,7 +2,8 @@
 %define offset_N 0
 %define offset_u 16
 %define offset_v 24
-%define cell_size 16
+%define cell_size 4
+%define window_size 4*cell_size
 
 section .text
 
@@ -24,60 +25,161 @@ solver_set_bnd:
 ; esi = uint32_t b
 ; rdx = float* x
 
+; Esta implementación asume que N es mayor o igual a 4 y que N es múltiplo de 4, de acuerdo a lo hablado con Emiliano Höß y Mariano Cerruti en la clase del martes 19 de septiembre.
+
 push r12
 push r13
 push r14
+push r15
+push rbx
 
 mov ecx, [rdi + offset_N] ; rcx = N
-
-mov 
 
 mov r8, rcx
 add r8, 2 ; r8 = N+2
 mov r14, r8
+shl r14, 4 ; r14 = (N+2)*16
 
-lea r9, [rdi + cell_size*r8]
+lea r9, [rdx + cell_size*r8]
 
-mul r8, rcx ; r8 = (N+2)*N
+mov eax, r8d 
+mul cx
+mov r8d, eax ; r8 = (N+2)*N
 
-lea r10, [rdi + cell_size*r8]
+lea r10, [rdx + cell_size*r8]
 
 add r8, rcx
 add r8, 2 ; r8 = (N+2)*(N+1)
 
-lea r11, [rdi + cell_size*r8]
+lea r11, [rdx + cell_size*r8]
 
-lea r8, [rdi + 16]
+lea r8, [rdx + cell_size]
 
-mov r13, r8
-add r13, r14 ; apunta al anteúltimo de la segunda fila
+lea r13, [r8 + cell_size*r14]
 mov r12, r9  ; apunta al primero de la segunda fila
 
-; r8 primera fila     ; rdi + 16
-; r9 segunda fila     ; rdi + 16*(N+2)
-; r10 anteúltima fila ; rdi + 16*(N+2)*(N)
-; r11 última fila     ; rdi + 16*(N+2)*(N+1)
+; r8 2da celda de la 1ra fila         ; rdx + 16
+; r9 2da celda de la 2da fila         ; rdx + 16*(N+2)
+; r10 2da celda de la anteúltima fila ; rdx + 16*(N+2)*(N)
+; r11 2da celda de la última fila     ; rdx + 16*(N+2)*(N+1)
+; r12 = r9, pero se va a usar para hacer el proceso vertical de la columna izquierda
+; r13 anteúltima celda de la 2da fila, para hacer el proceso vertical de la columna derecha
+; r14 tiene el tamaño de una fila para hacer saltos
 
-shr ecx, 2
+shr ecx, 2 ; proceso de a 4 elementos
 
 .ciclo:
-  movups xmm0, [r9]
-  movups xmm1, [r10]
+
+  ; filas (utilizamos SIMD)
+
+  movups xmm0, [r9]  ; segunda fila
+  movups xmm1, [r10] ; anteúltima fila
   cmp esi, 2
   jne .end_if_0
   	call change_sign_of_single_packed_xmm0_and_xmm1
   .end_if_0:
-  movups [r8], xmm0
-  movups [r11], xmm1
+  movups [r8], xmm0  ; primera fila
+  movups [r11], xmm1 ; última fila
 
+  add r8, window_size
+  add r9, window_size
+  add r10, window_size
+  add r11, window_size
 
+  ; para las columnas usamos SIMD solo para el cambio de signo, pero la lectura es individual
+
+  ; leer columna izquierda
+
+  lea r15, [r12 - cell_size]
+  pinsrd xmm0, [r12], 0
+  add r12, r14
+  pinsrd xmm0, [r12], 1
+  add r12, r14
+  pinsrd xmm0, [r12], 2
+  add r12, r14
+  pinsrd xmm0, [r12], 3
+  add r12, r14
+
+  ; leer columna derecha
+
+  lea rbx, [r13 + cell_size]
+  pinsrd xmm1, [r13], 0
+  add r13, r14
+  pinsrd xmm1, [r13], 1
+  add r13, r14
+  pinsrd xmm1, [r13], 2
+  add r13, r14
+  pinsrd xmm1, [r13], 3
+  add r13, r14
+
+  ; cambiar el signo a ambas columnas si corresponde
+
+  cmp esi, 1
+  jne .end_if_1
+    call change_sign_of_single_packed_xmm0_and_xmm1
+  .end_if_1:
+
+  ; guardar columna izquierda
+
+  movss [r15], xmm0
   
-  add r8, 16
-  add r9, 16
-  add r10, 16
-  add r11, 16
+  add r15, r14
+  psrldq xmm0, 4
+  movss [r15], xmm0
+  
+  add r15, r14
+  psrldq xmm0, 4
+  movss [r15], xmm0
+  
+  add r15, r14
+  psrldq xmm0, 4
+  movss [r15], xmm0
+
+  ; guardar columna derecha
+
+  movss [rbx], xmm1
+  
+  add rbx, r13
+  psrldq xmm1, 4
+  movss [rbx], xmm1
+  
+  add rbx, r13
+  psrldq xmm1, 4
+  movss [rbx], xmm1
+  
+  add rbx, r13
+  psrldq xmm1, 4
+  movss [rbx], xmm1
+
 loop .ciclo
 
+; r8 última celda de la 1ra fila
+; r9 última celda de la 2da fila
+; r10 última celda de la anteúltima fila
+; r11 última celda de la última fila
+; r12 segunda celda de la última fila
+; r13 anteúltima celda de la última fila
+; r14 tiene el tamaño de una fila para hacer saltos
+
+; esquinas
+
+movss xmm0, [rbx + cell_size] ; 2da celda, primera fila
+pinsrd xmm0, [r8 - cell_size], 1 ; anteúltima celda, primera fila
+pinsrd xmm0, [r12], 2 ; 2da celda, última fila
+pinsrd xmm0, [r13], 3 ; anteúltima celda, última fila
+
+movss xmm1, [rbx + r14] ; 1ra celda, segunda fila
+pinsrd xmm1, [r9], 1 ; última celda, segunda fila
+neg r14
+pinsrd xmm1, [r10 + r14 + cell_size], 2 ; 1ra celda, anteúltima fila
+pinsrd xmm1, [r10], 3 ; última celda, anteúltima fila
+
+addps xmm0, xmm1
+
+; falta dividir xmm0 por 2 y volver a insertar los datos en las esquinas
+
+pop rbx
+pop r15
 pop r14
 pop r13
 pop r12
@@ -86,13 +188,14 @@ ret
 change_sign_of_single_packed_xmm0_and_xmm1:
 ; supuestamente 0x0 se interpreta como cero en float
 
-movps xmm2, xmm0
-pxor xmm0
+movaps xmm2, xmm0
+pxor xmm0, xmm0
 subps xmm0, xmm2
 
-movps xmm2, xmm1
-pxor xmm1
+movaps xmm2, xmm1
+pxor xmm1, xmm1
 subps xmm1, xmm2
+
 ret
 
 global solver_project
