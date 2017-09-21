@@ -11,8 +11,8 @@ cuatro_floats_contiguos_de_valor_dos: DD 2.e1, 2.e1, 2.e1, 2.e1
 
 section .text
 
-global solver_lin_solve
-solver_lin_solve:
+;global solver_lin_solve
+;solver_lin_solve:
 ; void solver_lin_solve ( fluid_solver* solver, uint32_t b, float * x, float * x0, float a, float c )
 ; rdi = fluid_solver* solver
 ; esi = uint32_t b
@@ -20,7 +20,7 @@ solver_lin_solve:
 ; rcx = float* x0
 ; xmm0 = float a
 ; xmm1 = float b
-ret
+;ret
 
 global solver_set_bnd
 solver_set_bnd:
@@ -38,6 +38,62 @@ push r15
 push rbx
 
 mov ecx, [rdi + offset_N] ; rcx = N
+
+call setear_punteros_a_la_matriz
+
+; r8 2da celda de la 1ra fila         ; rdx + 16
+; r9 2da celda de la 2da fila         ; rdx + 16*(N+2)
+; r10 2da celda de la anteúltima fila ; rdx + 16*(N+2)*(N)
+; r11 2da celda de la última fila     ; rdx + 16*(N+2)*(N+1)
+; r12 = r9, pero se va a usar para hacer el proceso vertical de la columna izquierda
+; r13 anteúltima celda de la 2da fila, para hacer el proceso vertical de la columna derecha
+; r14 tiene el tamaño de una fila para hacer saltos
+
+shr ecx, 2 ; proceso de a 4 elementos
+
+.ciclo:
+
+  ; filas (utilizamos SIMD)
+
+  call procesar_filas
+
+  ; para las columnas usamos SIMD solo para el cambio de signo, pero la lectura es individual
+
+  call procesar_columnas
+
+loop .ciclo
+
+; r8 última celda de la 1ra fila
+; r9 última celda de la 2da fila
+; r10 última celda de la anteúltima fila
+; r11 última celda de la última fila
+; r12 segunda celda de la última fila
+; r13 anteúltima celda de la última fila
+; r14 tiene el tamaño de una fila para hacer saltos
+
+call procesar_esquinas
+
+pop rbx
+pop r15
+pop r14
+pop r13
+pop r12
+ret
+
+change_sign_of_single_packed_xmm0_and_xmm1:
+; supuestamente 0x0 se interpreta como cero en float
+
+movaps xmm2, xmm0
+pxor xmm0, xmm0
+subps xmm0, xmm2
+
+movaps xmm2, xmm1
+pxor xmm1, xmm1
+subps xmm1, xmm2
+
+ret
+
+setear_punteros_a_la_matriz:
 
 mov r8, rcx
 add r8, 2 ; r8 = N+2
@@ -62,110 +118,94 @@ lea r8, [rdx + cell_size]
 lea r13, [r8 + cell_size*r14]
 mov r12, r9  ; apunta al primero de la segunda fila
 
-; r8 2da celda de la 1ra fila         ; rdx + 16
-; r9 2da celda de la 2da fila         ; rdx + 16*(N+2)
-; r10 2da celda de la anteúltima fila ; rdx + 16*(N+2)*(N)
-; r11 2da celda de la última fila     ; rdx + 16*(N+2)*(N+1)
-; r12 = r9, pero se va a usar para hacer el proceso vertical de la columna izquierda
-; r13 anteúltima celda de la 2da fila, para hacer el proceso vertical de la columna derecha
-; r14 tiene el tamaño de una fila para hacer saltos
+ret
 
-shr ecx, 2 ; proceso de a 4 elementos
+procesar_filas:
 
-.ciclo:
+movups xmm0, [r9]  ; segunda fila
+movups xmm1, [r10] ; anteúltima fila
+cmp esi, 2
+jne .end_if_0
+  call change_sign_of_single_packed_xmm0_and_xmm1
+.end_if_0:
+movups [r8], xmm0  ; primera fila
+movups [r11], xmm1 ; última fila
 
-  ; filas (utilizamos SIMD)
+add r8, window_size
+add r9, window_size
+add r10, window_size
+add r11, window_size
 
-  movups xmm0, [r9]  ; segunda fila
-  movups xmm1, [r10] ; anteúltima fila
-  cmp esi, 2
-  jne .end_if_0
-  	call change_sign_of_single_packed_xmm0_and_xmm1
-  .end_if_0:
-  movups [r8], xmm0  ; primera fila
-  movups [r11], xmm1 ; última fila
+ret
 
-  add r8, window_size
-  add r9, window_size
-  add r10, window_size
-  add r11, window_size
+procesar_columnas:
 
-  ; para las columnas usamos SIMD solo para el cambio de signo, pero la lectura es individual
+; leer columna izquierda
 
-  ; leer columna izquierda
+lea r15, [r12 - cell_size]
+pinsrd xmm0, [r12], 0
+add r12, r14
+pinsrd xmm0, [r12], 1
+add r12, r14
+pinsrd xmm0, [r12], 2
+add r12, r14
+pinsrd xmm0, [r12], 3
+add r12, r14
 
-  lea r15, [r12 - cell_size]
-  pinsrd xmm0, [r12], 0
-  add r12, r14
-  pinsrd xmm0, [r12], 1
-  add r12, r14
-  pinsrd xmm0, [r12], 2
-  add r12, r14
-  pinsrd xmm0, [r12], 3
-  add r12, r14
+; leer columna derecha
 
-  ; leer columna derecha
+lea rbx, [r13 + cell_size]
+pinsrd xmm1, [r13], 0
+add r13, r14
+pinsrd xmm1, [r13], 1
+add r13, r14
+pinsrd xmm1, [r13], 2
+add r13, r14
+pinsrd xmm1, [r13], 3
+add r13, r14
 
-  lea rbx, [r13 + cell_size]
-  pinsrd xmm1, [r13], 0
-  add r13, r14
-  pinsrd xmm1, [r13], 1
-  add r13, r14
-  pinsrd xmm1, [r13], 2
-  add r13, r14
-  pinsrd xmm1, [r13], 3
-  add r13, r14
+; cambiar el signo a ambas columnas si corresponde
 
-  ; cambiar el signo a ambas columnas si corresponde
+cmp esi, 1
+jne .end_if_1
+  call change_sign_of_single_packed_xmm0_and_xmm1
+.end_if_1:
 
-  cmp esi, 1
-  jne .end_if_1
-    call change_sign_of_single_packed_xmm0_and_xmm1
-  .end_if_1:
+; guardar columna izquierda
 
-  ; guardar columna izquierda
+movss [r15], xmm0
 
-  movss [r15], xmm0
-  
-  add r15, r14
-  psrldq xmm0, 4
-  movss [r15], xmm0
-  
-  add r15, r14
-  psrldq xmm0, 4
-  movss [r15], xmm0
-  
-  add r15, r14
-  psrldq xmm0, 4
-  movss [r15], xmm0
+add r15, r14
+psrldq xmm0, 4
+movss [r15], xmm0
 
-  ; guardar columna derecha
+add r15, r14
+psrldq xmm0, 4
+movss [r15], xmm0
 
-  movss [rbx], xmm1
-  
-  add rbx, r13
-  psrldq xmm1, 4
-  movss [rbx], xmm1
-  
-  add rbx, r13
-  psrldq xmm1, 4
-  movss [rbx], xmm1
-  
-  add rbx, r13
-  psrldq xmm1, 4
-  movss [rbx], xmm1
+add r15, r14
+psrldq xmm0, 4
+movss [r15], xmm0
 
-loop .ciclo
+; guardar columna derecha
 
-; r8 última celda de la 1ra fila
-; r9 última celda de la 2da fila
-; r10 última celda de la anteúltima fila
-; r11 última celda de la última fila
-; r12 segunda celda de la última fila
-; r13 anteúltima celda de la última fila
-; r14 tiene el tamaño de una fila para hacer saltos
+movss [rbx], xmm1
 
-; esquinas
+add rbx, r13
+psrldq xmm1, 4
+movss [rbx], xmm1
+
+add rbx, r13
+psrldq xmm1, 4
+movss [rbx], xmm1
+
+add rbx, r13
+psrldq xmm1, 4
+movss [rbx], xmm1
+
+ret
+
+procesar_esquinas:
 
 movss xmm0, [rbx + cell_size] ; 2da celda, primera fila
 pinsrd xmm0, [r8 - cell_size], 1 ; anteúltima celda, primera fila
@@ -192,30 +232,12 @@ movss [r12 - cell_size], xmm0 ; esquina inferior izquierda
 psrldq xmm0, 4
 movss [r11], xmm0 ; esquina inferior derecha 
 
-pop rbx
-pop r15
-pop r14
-pop r13
-pop r12
 ret
 
-change_sign_of_single_packed_xmm0_and_xmm1:
-; supuestamente 0x0 se interpreta como cero en float
-
-movaps xmm2, xmm0
-pxor xmm0, xmm0
-subps xmm0, xmm2
-
-movaps xmm2, xmm1
-pxor xmm1, xmm1
-subps xmm1, xmm2
-
-ret
-
-global solver_project
-solver_project:
+;global solver_project
+;solver_project:
 ; void solver_project ( fluid_solver* solver, float * p, float * div )
 ; rdi = fluid_solver* solver
 ; rsi = float* p
 ; rdx = float* div
-ret
+;ret
