@@ -1,7 +1,7 @@
 #include "solver.h"
 #include "assert.h"
 
-void test_solver_set_bnd(uint32_t size, uint32_t b) {
+void test_solver_set_bnd(uint32_t size, uint32_t b, bool print_values) {
   fluid_solver* solver = solver_create(size, 0.05, 0, 0);
   solver_set_initial_density(solver);
 
@@ -15,22 +15,26 @@ void test_solver_set_bnd(uint32_t size, uint32_t b) {
     }
   }
 
-  printf("Initial values\n");
-  for (i = 0; i < (size+2); ++i) {
-    for (j = 0; j < (size+2); ++j) {
-      printf("%2.2f ", matrix[IX(j, i)]);
+  if (print_values) {
+    printf("Initial values\n");
+    for (i = 0; i < (size+2); ++i) {
+      for (j = 0; j < (size+2); ++j) {
+        printf("%2.2f ", matrix[IX(j, i)]);
+      }
+      printf("\n");
     }
-    printf("\n");
   }
 
   solver_set_bnd_c(solver, b, matrix);
 
-  printf("Final values\n");
-  for (i = 0; i < (size+2); ++i) {
-    for (j = 0; j < (size+2); ++j) {
-      printf("%2.2f ", matrix[IX(j, i)]);
+  if (print_values) {
+    printf("Final values\n");
+    for (i = 0; i < (size+2); ++i) {
+      for (j = 0; j < (size+2); ++j) {
+        printf("%2.2f ", matrix[IX(j, i)]);
+      }
+      printf("\n");
     }
-    printf("\n");
   }
 
   solver_set_bnd(solver, b, solver->u);
@@ -70,6 +74,11 @@ void test_solver_set_bnd(uint32_t size, uint32_t b) {
 }*/
 
 int main() {
-  test_solver_set_bnd(4, 3);
+  test_solver_set_bnd(4, 1, false);
+  test_solver_set_bnd(4, 2, false);
+  test_solver_set_bnd(4, 3, false);
+  test_solver_set_bnd(128, 1, false);
+  test_solver_set_bnd(128, 2, false);
+  test_solver_set_bnd(128, 3, false);
   return 0;
 }
