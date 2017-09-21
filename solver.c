@@ -111,10 +111,10 @@ void solver_lin_solve ( fluid_solver* solver, uint32_t b, float * x, float * x0,
 	}
 }
 
-/*void solver_set_bnd ( fluid_solver* solver, uint32_t b, float * x ){
+void solver_set_bnd_c ( fluid_solver* solver, uint32_t b, float * x ){
 	uint32_t i;
 	uint32_t N = solver->N;
-	for ( i=N ; i>=1 ; --i ) {
+	for ( i=1 ; i<=N ; ++i ) {
 		x[IX(0  ,i)] = (b==1 ? -1 : 1) * x[IX(1,i)];
 		x[IX(N+1,i)] = (b==1 ? -1 : 1) * x[IX(N,i)];
 		x[IX(i,0  )] = (b==2 ? -1 : 1) * x[IX(i,1)];
@@ -124,7 +124,7 @@ void solver_lin_solve ( fluid_solver* solver, uint32_t b, float * x, float * x0,
 	x[IX(0  ,N+1)] = 0.5f*(x[IX(1,N+1)]+x[IX(0  ,N)]);
 	x[IX(N+1,0  )] = 0.5f*(x[IX(N,0  )]+x[IX(N+1,1)]);
 	x[IX(N+1,N+1)] = 0.5f*(x[IX(N,N+1)]+x[IX(N+1,N)]);
-}*/
+}
 
 void solver_project ( fluid_solver* solver, float * p, float * div ){
 	uint32_t i, j;

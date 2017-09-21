@@ -7,7 +7,10 @@ MACLIBS = -framework OpenGL -framework GLUT
 NASM=nasm
 NASMFLAGS=-f elf64 -g -F DWARF
 
-all: demo
+all: demo test
+
+test: test.c solver_asm.o solver_c.o
+	$(CC) $(CFLAGS) $^ -o $@  $(LIBS)
 
 demo: demo.c solver_c.o solver_asm.o bmp.o
 	$(CC) $(CFLAGS) $^ -o $@  $(LIBS)

@@ -1,4 +1,5 @@
 *.o
 demo
 demo_mac
+test
 /tmp
