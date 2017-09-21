@@ -26,7 +26,6 @@ mov rdi, rdx ; para preservarlo porque mul lo modifica
 mov eax, r8d
 mul cx
 mov r8d, eax ; r8 = (N+2)*N
-mov r8d, 24
 mov rdx, rdi
 
 lea r10, [rdx + cell_size*r8 + cell_size] ; r10 -> 2da celda de la anteúltima fila
