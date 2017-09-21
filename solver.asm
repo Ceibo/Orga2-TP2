@@ -5,6 +5,10 @@
 %define cell_size 4
 %define window_size 4*cell_size
 
+section .data
+
+cuatro_floats_contiguos_de_valor_dos: DD 2.e1, 2.e1, 2.e1, 2.e1
+
 section .text
 
 global solver_lin_solve
@@ -175,8 +179,18 @@ pinsrd xmm1, [r10 + r14 + cell_size], 2 ; 1ra celda, anteúltima fila
 pinsrd xmm1, [r10], 3 ; última celda, anteúltima fila
 
 addps xmm0, xmm1
+divps xmm0, [cuatro_floats_contiguos_de_valor_dos]
 
-; falta dividir xmm0 por 2 y volver a insertar los datos en las esquinas
+movss [rdi], xmm0 ; esquina superior izquierda
+
+psrldq xmm0, 4
+movss [r8], xmm0 ; esquina superior derecha
+
+psrldq xmm0, 4
+movss [r12 - cell_size], xmm0 ; esquina inferior izquierda
+
+psrldq xmm0, 4
+movss [r11], xmm0 ; esquina inferior derecha 
 
 pop rbx
 pop r15
