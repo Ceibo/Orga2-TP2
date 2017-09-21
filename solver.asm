@@ -7,7 +7,7 @@
 
 section .data
 
-cuatro_floats_contiguos_de_valor_dos: DD 2.e1, 2.e1, 2.e1, 2.e1
+cuatro_floats_contiguos_de_valor_dos: DD 2.0, 2.0, 2.0, 2.0
 
 section .text
 
