@@ -22,9 +22,12 @@ shl r14, 2 ; r14 = (N+2)*cell_size
 
 lea r9, [rdx + r14 + cell_size] ; r9 -> 2da celda de la 2da fila
 
+mov rdi, rdx ; para preservarlo porque mul lo modifica
 mov eax, r8d
 mul cx
 mov r8d, eax ; r8 = (N+2)*N
+mov r8d, 24
+mov rdx, rdi
 
 lea r10, [rdx + cell_size*r8 + cell_size] ; r10 -> 2da celda de la anteúltima fila
 
@@ -127,30 +130,35 @@ ret
 
 procesar_esquinas:
 
-pinsrd xmm0, [rdx + cell_size], 0 ; 2da celda, primera fila
-pinsrd xmm0, [r8 - cell_size], 1 ; anteúltima celda, primera fila
-pinsrd xmm0, [r12], 2 ; 2da celda, última fila
-pinsrd xmm0, [r13], 3 ; anteúltima celda, última fila
+cmp esi, 1
+je .poner_cero_en_las_esquinas
 
-pinsrd xmm1, [rdx + r14], 0 ; 1ra celda, segunda fila
-pinsrd xmm1, [r9], 1 ; última celda, segunda fila
-neg r14
-pinsrd xmm1, [r10 + r14 + cell_size], 2 ; 1ra celda, anteúltima fila
-pinsrd xmm1, [r10], 3 ; última celda, anteúltima fila
+cmp esi, 2
+je .poner_cero_en_las_esquinas
 
-addps xmm0, xmm1
-movups xmm1, [cuatro_floats_contiguos_de_valor_dos]
-divps xmm0, xmm1
+; b no es ni 1 ni 2
 
-movss [rdx], xmm0 ; esquina superior izquierda
+mov eax, [rdx + cell_size]
+mov [rdx], eax ; esquina superior izquierda
 
-psrldq xmm0, cell_size
-movss [r8], xmm0 ; esquina superior derecha
+mov eax, [r9]
+mov [r8], eax ; esquina superior derecha
 
-psrldq xmm0, cell_size
-movss [r12 - cell_size], xmm0 ; esquina inferior izquierda
+mov eax, [r12]
+mov [r12 - cell_size], eax ; esquina inferior izquierda
 
-psrldq xmm0, cell_size
-movss [r11], xmm0 ; esquina inferior derecha 
+mov eax, [r13]
+mov [r11], eax ; esquina inferior derecha
 
+jmp .fin
+
+.poner_cero_en_las_esquinas:
+
+xor eax, eax
+mov [rdx], eax ; esquina superior izquierda
+mov [r8], eax ; esquina superior derecha
+mov [r12 - cell_size], eax ; esquina inferior izquierda
+mov [r11], eax ; esquina inferior derecha
+
+.fin:
 ret

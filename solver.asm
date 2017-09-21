@@ -5,10 +5,6 @@
 %define cell_size 4
 %define window_size 4*cell_size
 
-section .data
-
-cuatro_floats_contiguos_de_valor_dos: DD 2.0, 2.0, 2.0, 2.0
-
 section .text
 
 %include "solver_set_bnd_functions.inc"
@@ -51,7 +47,7 @@ call setear_punteros_a_la_matriz
 ; r13 anteúltima celda de la 2da fila, para hacer el proceso vertical de la columna derecha
 ; r14 tiene el tamaño de una fila para hacer saltos
 
-shr ecx, 2 ; proceso de a 4 elementos
+shr ecx, 2 ; se divide por 4 para procesar de a 4 elementos
 
 .ciclo:
 
