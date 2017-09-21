@@ -1,9 +1,16 @@
 ; fluid_solver
 %define offset_N 0
+%define offset_dt 4
+%define offset_diff 8
+%define offset_visc 12
 %define offset_u 16
 %define offset_v 24
 %define cell_size 4
 %define window_size 4*cell_size
+%define offset_u_prev 32
+%define offset_v_prev 40
+%define offset_dens 48
+%define offset_dens_prev 56
 
 section .text
 
