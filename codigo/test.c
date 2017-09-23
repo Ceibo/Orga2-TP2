@@ -77,8 +77,23 @@ int main() {
   test_solver_set_bnd(4, 1, false);
   test_solver_set_bnd(4, 2, false);
   test_solver_set_bnd(4, 3, false);
+  test_solver_set_bnd(16, 1, false);
+  test_solver_set_bnd(16, 2, false);
+  test_solver_set_bnd(16, 3, false);
+  test_solver_set_bnd(32, 1, false);
+  test_solver_set_bnd(32, 2, false);
+  test_solver_set_bnd(32, 3, false);
+  test_solver_set_bnd(64, 1, false);
+  test_solver_set_bnd(64, 2, false);
+  test_solver_set_bnd(64, 3, false);
   test_solver_set_bnd(128, 1, false);
   test_solver_set_bnd(128, 2, false);
   test_solver_set_bnd(128, 3, false);
+  test_solver_set_bnd(256, 1, false);
+  test_solver_set_bnd(256, 2, false);
+  test_solver_set_bnd(256, 3, false);
+  test_solver_set_bnd(512, 1, false);
+  test_solver_set_bnd(512, 2, false);
+  test_solver_set_bnd(512, 3, false);
   return 0;
 }

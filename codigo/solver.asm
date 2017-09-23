@@ -89,8 +89,43 @@ ret
 
 ;global solver_project
 ;solver_project:
-; void solver_project ( fluid_solver* solver, float * p, float * div )
-; rdi = fluid_solver* solver
-; rsi = float* p
-; rdx = float* div
+;void solver_project ( fluid_solver* solver, float * p, float * div )
+;rdi = fluid_solver* solver
+;rsi = float* p
+;rdx = float* div
+
+;ciclo1 ACA HAY QUE USAR SIMD
+;div[IX(i,j)] = -0.5f*(solver->u[IX(i+1,j)]-solver->u[IX(i-1,j)]+solver->v[IX(i,j+1)]-solver->v[IX(i,j-1)])/solver->N;
+;p[IX(i,j)] = 0;
+
+
+;Hay que poner los parametros en los registros para llamar correctamente a la funcion
+
+;solver_set_bnd ( solver, 0, div )//solver = rdi, 0 = xmm0, div = xmm1
+;mov rdi, SOLVER
+;mov xmm0, 0
+;mov xmm1, DIV (ver donde estaba cuando lo escriba)
+;call set_solver_bnd
+
+;Voy a llamarla de vuelta, aca tengo que acomodar de nuevo las cosas en los registros.
+;solver_set_bnd ( solver, 0, p )
+;mov rdi, SOLVER
+;mov xmm0, 0
+;mov xmm1, P
+;call set_solver_bnd
+
+;Ahora llamo a esta otra, de nuevo tengo que poner en orden los registros
+;solver_lin_solve ( solver, 0, p, div, 1, 4 ) // solver = rdi, 0 = rsi, p = rdx, div = rcx, 1 = xmm0, 4 = xmm1
+;mov rdi, SOLVER
+;mov rsi, 0 // xor rsi, rsi
+;mov rdx, p
+;mov rcx, div
+;mov xmm0, 1
+;mov xmm1, 4
+;call solver_lin_solve
+
+;ciclo2 Y ACA TAMBIEN HAY QUE USAR SIMD
+
 ;ret
+
+
