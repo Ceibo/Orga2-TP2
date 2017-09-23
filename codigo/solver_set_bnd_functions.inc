@@ -24,7 +24,7 @@ lea r9, [rdx + r14 + float_size] ; r9 -> 2da celda de la 2da fila
 
 mov rdi, rdx ; para preservarlo porque mul lo modifica
 mov eax, r8d
-mul cx
+mul ecx
 mov r8d, eax ; r8 = (N+2)*N
 mov rdx, rdi
 
