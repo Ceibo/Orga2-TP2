@@ -5,3 +5,4 @@ test
 *.pdf
 *.aux
 *.log
+matrix_*.bmp
