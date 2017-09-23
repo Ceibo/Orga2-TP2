@@ -1,16 +1,3 @@
-cambiar_signo_de_los_cuatro_float_en_xmm0_y_xmm1:
-; 0x0 se interpreta como cero en float
-
-movaps xmm2, xmm0
-pxor xmm0, xmm0
-subps xmm0, xmm2
-
-movaps xmm2, xmm1
-pxor xmm1, xmm1
-subps xmm1, xmm2
-
-ret
-
 setear_punteros_a_la_matriz:
 
 mov r8d, ecx ; r8 = N
@@ -42,14 +29,18 @@ mov r12, r9 ; r12 -> 2da celda de la 2da fila
 
 ret
 
-procesar_filas:
+procesar_filas_y_columnas:
+
+; PROCESAR FILAS
 
 movups xmm0, [r9]  ; segunda fila
 movups xmm1, [r10] ; anteúltima fila
 cmp esi, 2
-jne .end_if
-  call cambiar_signo_de_los_cuatro_float_en_xmm0_y_xmm1
-.end_if:
+jne .end_if_0
+  ; en xmm3 hay una máscara que les cambia el signo a los 4 float
+  pxor xmm0, xmm3
+  pxor xmm1, xmm3
+.end_if_0:
 movups [r8], xmm0  ; primera fila
 movups [r11], xmm1 ; última fila
 
@@ -58,9 +49,7 @@ add r9, xmm_size
 add r10, xmm_size
 add r11, xmm_size
 
-ret
-
-procesar_columnas:
+; PROCESAR COLUMNAS
 
 ; leer columna izquierda
 
@@ -89,9 +78,11 @@ add r13, r14
 ; cambiar el signo a ambas columnas si corresponde
 
 cmp esi, 1
-jne .end_if
-  call cambiar_signo_de_los_cuatro_float_en_xmm0_y_xmm1
-.end_if:
+jne .end_if_1
+  ; en xmm3 hay una máscara que les cambia el signo a los 4 float
+  pxor xmm0, xmm3
+  pxor xmm1, xmm3
+.end_if_1:
 
 ; guardar columna izquierda
 

@@ -14,6 +14,10 @@
 %define float_size 4
 %define xmm_size 16
 
+section .data
+
+dquad_con_bits_de_signo_float_en_1_y_el_resto_en_0: DD 0x80000000, 0x80000000, 0x80000000, 0x80000000
+
 section .text
 
 %include "solver_set_bnd_functions.inc"
@@ -58,15 +62,16 @@ call setear_punteros_a_la_matriz
 
 shr ecx, 2 ; se divide por 4 para procesar de a 4 elementos
 
+; máscara para cambio de signo
+movdqu xmm3, [dquad_con_bits_de_signo_float_en_1_y_el_resto_en_0]
+
 .ciclo:
 
-  ; filas (utilizamos SIMD)
-
-  call procesar_filas
+  ; para las filas usamos procesamiento vectorial completo (SIMD)
 
   ; para las columnas usamos SIMD solo para el cambio de signo, pero la lectura es individual
 
-  call procesar_columnas
+  call procesar_filas_y_columnas
 
 loop .ciclo
 
