@@ -92,12 +92,65 @@ pop r13
 pop r12
 ret
 
-;global solver_project
-;solver_project:
+global solver_project
+solver_project:
 ;void solver_project ( fluid_solver* solver, float * p, float * div )
 ;rdi = fluid_solver* solver
 ;rsi = float* p
 ;rdx = float* div
+
+mov eax, [rdi + offset_N] ;Tengo en edx el int32 N, tamaño de la matriz
+mov r8d, eax; me guardo el n en r8d
+add r8d, 3; en r8d tengo N+2
+lea rsi, [rsi + r8*float_size] ;VER SI DEJA USAR RSI O HAY QUE USAR UN REGISTRO AUXILIAR
+sub r8d, 3; Vuelvo a tener N en r8d
+mul eax; Toma eax y lo multiplica por lo que hay en eax.
+mov ecx, eax; Para LOOP
+xor r9, r9
+mov eax, [rdi + offset_u]; Pongo en eax el puntero al primer elemento de la matriz u
+mov r10d, [rdi + offset_v]; Pongo en r10d el puntero al primer elemento de la matriz v
+add r10d, float_size;
+
+
+
+lea r8d, [r8d + 2*float_size]; Tengo en r8d N+2
+;add r10d, r8d; Sumo una fila al primer elemento de la matriz v y estoy ahora
+.ciclo:
+;solver->u[IX(i+1,j)]-solver->u[IX(i-1,j)]
+add eax, float_size;
+movups xmm1, [eax]; Tengo en xmm1 los (i+1,j)
+lea eax, [eax - 2*float_size]
+movups xmm2, [eax]; Ahora tengo en xmm2 los (i-1,j)
+subps xmm1, xmm2; Acá tengo solver->u[IX(i+1,j)]-solver->u[IX(i-1,j)] en xmm1
+lea eax, [eax + 4*float_size]; Me muevo 4 posiciones para volver a ejecutar
+; en el primer elemento de la "submatriz" que voy a querer recorrer
+
+
+movups xmm3, [r10d]; Pongo en xmm3 los primeros 4 elementos de la matriz. El (i,j-1)
+lea r10d, [r10d + r8d*float_size]; Le agrego N+2 a r10d, o sea, bajo una fila
+lea r10d, [r10d + r8d*float_size]
+movups xmm4, [r10d]; Tengo 4 elementos de la matriz pero una fila abajo de los de xmm3. El (i,j+1)
+subps xmm4, xmm3; En xmm4 tengo la diferencia, el resultasdo que quiero
+lea r10d, [r10d + 4*float_size] ;ESTO ME HACE RUIDO
+
+
+
+
+
+pxor xmm0, xmm0
+movups [rsi], xmm0
+add r9, float_size; Por que voy a usar xmm y agrrar de a 4 floats
+cmp r8d, r9d
+jne .fin
+	xor r9, r9
+	sub rsi, float_size
+.fin:
+add rsi, xmm_size
+loop .ciclo
+
+ret
+
+
 
 ;ciclo1 ACA HAY QUE USAR SIMD
 ;div[IX(i,j)] = -0.5f*(solver->u[IX(i+1,j)]-solver->u[IX(i-1,j)]+solver->v[IX(i,j+1)]-solver->v[IX(i,j-1)])/solver->N;
