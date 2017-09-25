@@ -231,9 +231,9 @@ solver_lin_solve:
 .seguir:
 
 ;llamar funciOn solver_set_bnd:
-	xor rdi
-	xor rsi
-	xor rdx
+	xor rdi,rdi
+	xor rsi,rsi
+	xor rdx,rdx
 	mov rdi,rbx;rbx <------------ solver , primer parAmetro solver_set_bnd
 	mov rsi,r14;r14d <----------------- b , segundo parAmetro solver_set_bnd
 	mov rdx,r13 ;r13 <----------------- x , tercer parAmetro solver_set_bnd
