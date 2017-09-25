@@ -62,7 +62,7 @@ call setear_punteros_a_la_matriz
 
 shr ecx, 2 ; se divide por 4 para procesar de a 4 elementos
 
-; máscara para cambio de signo
+; máscara que con pxor cambia el signo a cuatro float empaquetados
 movdqu xmm3, [dquad_con_bits_de_signo_float_en_1_y_el_resto_en_0]
 
 .ciclo:
