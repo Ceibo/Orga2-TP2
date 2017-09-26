@@ -18,6 +18,8 @@ section .data
 
 dquad_con_bits_de_signo_float_en_1_y_el_resto_en_0: DD 0x80000000, 0x80000000, 0x80000000, 0x80000000
 
+constante_unmedio_negativo_para_solver: DD -0.5, -0.5, -0.5, -0.5
+
 section .text
 
 %include "solver_set_bnd_functions.inc"
@@ -330,14 +332,16 @@ lea rsi, [rsi + r8*float_size] ;VER SI DEJA USAR RSI O HAY QUE USAR UN REGISTRO 
 sub r8d, 3; Vuelvo a tener N en r8d
 mul eax; Toma eax y lo multiplica por lo que hay en eax.
 mov ecx, eax; Para LOOP
-xor r9, r9
 mov eax, [rdi + offset_u]; Pongo en eax el puntero al primer elemento de la matriz u
 mov r10d, [rdi + offset_v]; Pongo en r10d el puntero al primer elemento de la matriz v
-add r10d, float_size;
-lea r8d, [r8d + 2*float_size]; Tengo en r8d N+2
+add r10d, float_size; Ahora apunta al (1,0)(columna, fila)
+add r8d, float_size
+add r8d, float_size; Tengo en r8d N+2
+xor r9, r9;
+mov r9d, [rdi + offset_N]; Acá va el N, que está al principio del stuct
 ;add r10d, r8d; Sumo una fila al primer elemento de la matriz v y estoy ahora
-
-
+mov r11, rdx; Guardo en r11 el div. Para poder las llamadas de despues 
+mov rax, rsi; Como es void puedo usar el rax, y lo uso para preservar el rsi.
 
 .ciclo1:
 ;solver->u[IX(i+1,j)]-solver->u[IX(i-1,j)]
@@ -349,28 +353,55 @@ subps xmm1, xmm2; Acá tengo solver->u[IX(i+1,j)]-solver->u[IX(i-1,j)] en xmm1
 lea eax, [eax + 4*float_size]; Me muevo 4 posiciones para volver a ejecutar
 ; en el primer elemento de la "submatriz" que voy a querer recorrer
 
-movups xmm3, [r10d]; Pongo en xmm3 los primeros 4 elementos de la matriz. El (i,j-1)
-lea r10d, [r10d + r8d*float_size]; Le agrego N+2 a r10d, o sea, bajo una fila
-lea r10d, [r10d + r8d*float_size]
-movups xmm4, [r10d]; Tengo 4 elementos de la matriz pero una fila abajo de los de xmm3. El (i,j+1)
+movups xmm3, [r10]; Pongo en xmm3 los primeros 4 elementos de la matriz. El (i,j-1)
+lea r10, [r10 + r8*float_size]; Le agrego N+2 a r10d, o sea, bajo una fila
+lea r10, [r10 + r8*float_size]
+movups xmm4, [r10]; Tengo 4 elementos de la matriz pero una fila abajo de los de xmm3. El (i,j+1)
 subps xmm4, xmm3; En xmm4 tengo la diferencia, el resultasdo que quiero
 lea r10d, [r10d + 4*float_size] ;ESTO ME HACE RUIDO
 
+;Ahora tengo en xmm1 y xmm4 los resultados de las cuentas de u y v
+addps xmm1, xmm4; Ahora tengo todo en xmm1, entonces xmm4 está libre tambien ahora
+;Ahora voy a multiplicar xmm1 por -1/2
+mulps xmm1, constante_unmedio_negativo_para_solver; Ahora me falta dividirlo por el solver->N (r9d)
+movss xmm6, r9d; Pongo en la derecha supuestamente de xmm6 el N
+pslld xmm6; shifteo el 
+movss xmm6, r9d;
+pslld xmm6;
+movss xmm6, r9d;
+pslld xmm6
+movss xmm6, r9d;
+;Y ahora tengo en xmm6 algo así: [N, N, N, N]
+;Ahora divido xmm1 por xmm6
+divps xmm1, xmm6;
+movups [rdx], xmm1
+
+
+
 pxor xmm0, xmm0
+xor r9, r9; Pongo el r9 en 0, por que ya lo termine de usar y ahora lo quiero usar para otra cosa de nuevo
 movups [rsi], xmm0
 add r9, float_size; Por que voy a usar xmm y agrrar de a 4 floats
 cmp r8d, r9d
 jne .fin
 	xor r9, r9
 	sub rsi, float_size
+
 .fin:
-add rsi, xmm_size
+add rsi, xmm_size;puntero a p
+add eax, xmm_size;puntero a u
+add r10, xmm_size;puntero a v
+add rdx, xmm_size;puntero a div
 loop .ciclo1
+
+mov rdx, r11; Restauro rdi para tener el puntero a principio de div para cuando llame
+;a otras funciones ahora.
+mov rsi, rax; Restauro rsi, el float p, para poder volver a usarlo en otras funciones.
 
 ret
 
 ;solver_set_bnd ( solver, 0, div )//solver = rdi, 0 = esi, div = rdx
-;REVISAR QUE PASA CON EL DIV
+;rdi y rdx están ok. Solo tengo que pober esi en 0
 xor rsi, rsi
 call solver_set_bnd
 
