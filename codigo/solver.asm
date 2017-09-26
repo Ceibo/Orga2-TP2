@@ -334,12 +334,12 @@ xor r9, r9
 mov eax, [rdi + offset_u]; Pongo en eax el puntero al primer elemento de la matriz u
 mov r10d, [rdi + offset_v]; Pongo en r10d el puntero al primer elemento de la matriz v
 add r10d, float_size;
-
-
-
 lea r8d, [r8d + 2*float_size]; Tengo en r8d N+2
 ;add r10d, r8d; Sumo una fila al primer elemento de la matriz v y estoy ahora
-.ciclo:
+
+
+
+.ciclo1:
 ;solver->u[IX(i+1,j)]-solver->u[IX(i-1,j)]
 add eax, float_size;
 movups xmm1, [eax]; Tengo en xmm1 los (i+1,j)
@@ -349,17 +349,12 @@ subps xmm1, xmm2; Acá tengo solver->u[IX(i+1,j)]-solver->u[IX(i-1,j)] en xmm1
 lea eax, [eax + 4*float_size]; Me muevo 4 posiciones para volver a ejecutar
 ; en el primer elemento de la "submatriz" que voy a querer recorrer
 
-
 movups xmm3, [r10d]; Pongo en xmm3 los primeros 4 elementos de la matriz. El (i,j-1)
 lea r10d, [r10d + r8d*float_size]; Le agrego N+2 a r10d, o sea, bajo una fila
 lea r10d, [r10d + r8d*float_size]
 movups xmm4, [r10d]; Tengo 4 elementos de la matriz pero una fila abajo de los de xmm3. El (i,j+1)
 subps xmm4, xmm3; En xmm4 tengo la diferencia, el resultasdo que quiero
 lea r10d, [r10d + 4*float_size] ;ESTO ME HACE RUIDO
-
-
-
-
 
 pxor xmm0, xmm0
 movups [rsi], xmm0
@@ -370,33 +365,20 @@ jne .fin
 	sub rsi, float_size
 .fin:
 add rsi, xmm_size
-loop .ciclo
+loop .ciclo1
 
 ret
 
+;solver_set_bnd ( solver, 0, div )//solver = rdi, 0 = esi, div = rdx
+;REVISAR QUE PASA CON EL DIV
+xor rsi, rsi
+call solver_set_bnd
 
+;solver_set_bnd ( solver, 0, p ). Solver->rdi, 0->esi, p->rdx
+;CUIDADO QUE TENGO QUE PRESERVAR EL P DEL PRINCIPIO.
+;ARREGLARLO DESPUES DE TERMINAR LAS OTRAS FUNCIONES ANTERIORES
+call set_solver_bnd
 
-;ciclo1 ACA HAY QUE USAR SIMD
-;div[IX(i,j)] = -0.5f*(solver->u[IX(i+1,j)]-solver->u[IX(i-1,j)]+solver->v[IX(i,j+1)]-solver->v[IX(i,j-1)])/solver->N;
-;p[IX(i,j)] = 0;
-
-
-;Hay que poner los parametros en los registros para llamar correctamente a la funcion
-
-;solver_set_bnd ( solver, 0, div )//solver = rdi, 0 = xmm0, div = xmm1
-;mov rdi, SOLVER
-;mov xmm0, 0
-;mov xmm1, DIV (ver donde estaba cuando lo escriba)
-;call set_solver_bnd
-
-;Voy a llamarla de vuelta, aca tengo que acomodar de nuevo las cosas en los registros.
-;solver_set_bnd ( solver, 0, p )
-;mov rdi, SOLVER
-;mov xmm0, 0
-;mov xmm1, P
-;call set_solver_bnd
-
-;Ahora llamo a esta otra, de nuevo tengo que poner en orden los registros
 ;solver_lin_solve ( solver, 0, p, div, 1, 4 ) // solver = rdi, 0 = rsi, p = rdx, div = rcx, 1 = xmm0, 4 = xmm1
 ;mov rdi, SOLVER
 ;mov rsi, 0 // xor rsi, rsi
