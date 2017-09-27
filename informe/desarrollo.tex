@@ -1,3 +1,9 @@
-Desarrollo: Describe en profundidad cada una de las funciones que implementaron.
-Para la decripción de cada función deberan decir cómo opera una iteración del ciclo de la función. Es decir, cómo mueven los datos de la matriz a los registros, cómo los reordenan para procesarlos, las operaciones que se aplican a los datos, etc. Para esto pueden utilizar
-pseudocódigo, diagramas (mostrando gráficamente el contenido de los registros XMM) o cualquier otro recurso que les resulte útil para describir la adaptación del algoritmo al procesamiento vectorial. No se deberá incluir el código assembler de las funciones (aunque se pueden incluir extractos en donde haga falta).
+El código fuente de la simulación está escrito en lenguaje C y el compilador utilizado es GCC. Para las funciones de C \textit{solver\_lin\_solve}, \textit{solver\_set\_bnd} y \textit{solver\_project} hicimos implementaciones alternativas escritas en el lenguaje ensamblador de la familia de procesadores Intel x86-64. Las instrucciones vectoriales en lenguaje ensamblador utilizan registros de 128 bits. Los estados de la simulación se representan mediante matrices de números decimales de punto flotante de precisión simple (32 bits). Los algoritmos asumen que todas las matrices en una ejecución particular constan de $n\ +\ 2$ filas y $n\ +\ 2$ columnas con $n\ \geq\ 4$ y $n$ múltiplo de 4. A continuación se explica la implementación en ensamblador de las tres funciones.
+\subsection{Función solver\_lin\_solve}
+Lorem Ipsum dolot sit amet
+\subsection{Función solver\_set\_bnd}
+La función solver\_set\_bnd se encarga de actualizar los valores del borde.
+\par El algoritmo consta de tres partes: el procesamiento de los bordes horizontales (la primera y la última fila de la matriz), el procesamiento de los bordes verticales (la primera y la última columa) y el procesamiento de las esquinas. Los primeros dos se realizan en un ciclo.
+\par El procesamiento horizontal consiste en
+\subsection{Función solver\_project}
+Lorem Ipsum dolor sit amet

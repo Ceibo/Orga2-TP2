@@ -27,8 +27,10 @@ section .text
 ;*************************************************************************************************
 
 
-global solver_lin_solve
+global solver_lin_solve;        
 
+;extern solver_set_bnd
+ 
 %define offset_a -4
 %define offset_c -8
 
@@ -52,10 +54,11 @@ solver_lin_solve:
 	
 	cmp rdi,0
 	je .fin
-	cmp rdx ,0
-	je .fin
-	cmp rcx,0
-	je .fin; 
+	;cmp rdx ,0
+	;je .fin
+	;cmp rcx,0
+	;je .fin; 
+	
 	
 ;backups de argumentos iniciales
 	mov rbx, rdi ;                                           ** rbx <------------ solver **
@@ -68,9 +71,13 @@ solver_lin_solve:
     xor r15,r15
     mov r15,0
     
-.ciclo_k: ; ciclo externo que itera sobre k desde 1 hasta 20
-	cmp r15,20
+.ciclo_k: ; ciclo externo que itera sobre k desde 0 hasta 19
+	cmp r15,    20 ;                                     
 	je .fin
+	cmp rdx ,0
+	je .seguir; si x es NULL entonces saltear ciclo
+	cmp rcx,0
+	je .seguir;  si x0 es NULL entonces saltear ciclo
 	
 	mov r8,r13; r8 puntero a x 
 	mov r9, r12 ; r9 puntero a x0
@@ -81,10 +88,11 @@ solver_lin_solve:
 	mov r10d,eax;                               ** r10d <--------  N **
 	inc eax; eax = N+1
 	xor rcx,rcx
-	mov ecx,4
-	mul ecx; edx : eax = (N+1)*4
-	shl rax,32; ** agregado **
-    shrd rax,rdx,32;** agregado ** rax = edx:eax
+	;mov ecx,4
+	;mul ecx; edx : eax = (N+1)*4
+	;shl rax,32; ** agregado **
+    ;shrd rax,rdx,32;** agregado ** rax = edx:eax
+    sal rax,2 ; rax = (N+1)*4
     mov rcx,rax;                                 ** rcx <------ (N+1)*4 **
 	xor r11,r11
 	mov r11d,4
@@ -197,8 +205,8 @@ solver_lin_solve:
 ;preparamos registros para siguiente punto:
 	 cmp rdi,2
 	 je .actualizar_registros; si obtuvimos 2 resultados debemos actualizar registros
-	 psrldq xmm8,4; xmm8 = .| x(i+1,j+1)+x(i+2,j)+x(i+1,j-1)
-	 psrldq xmm4,4; xmm4 = .| x0(i+1,j)
+	 psrldq xmm8,8; xmm8 = .| x(i+1,j+1)+x(i+2,j)+x(i+1,j-1)
+	 psrldq xmm4,8; xmm4 = .| x0(i+1,j)
 	 inc rdi
 	 jmp .operacion
 	 
@@ -211,7 +219,7 @@ solver_lin_solve:
 .fin_operacion:
 	 movups xmm12,xmm2 ; xmm12 = punto_1 | punto_2 | punto_3 | punto_4
 	 pshufd xmm2,xmm12,00011011b ; xmm2 = punto_4 | punto_3 | punto_2 | punto_1 , invertimos xmm2
-	 movups [r8],xmm2; updateamos 4 puntos consecutivos de x
+ 	 movups [r8+rcx+4],xmm2; updateamos 4 puntos consecutivos en siguiente fila de x  
 	 add r8,rcx; r8 apunta a N+1 Esima posiciOn 
 	 add r8,4 ; r8 apunta a N+2 Esima posiciOn ; actualizado x
 	 add r9,rcx; r9 apunta a N+1 Esima posiciOn
@@ -220,14 +228,22 @@ solver_lin_solve:
 	 jmp .subciclo_4_en_paralelo
 	 
 .fin_de_ciclo_principal:
+	 
+	 xor rsi,rsi
+	 mov esi,1; j en 1 
+	 
+	 mov r8,r13; r8 restaurado a x 
+	 mov r9, r12 ; r9 restaurado a x0
+	 add r8,4;                                                 ** r8 apunta a x(1,0) **
+	 add r9,rcx 
+	 add r9,8;  r9 apunta a (N+3) Esima posiciOn                 ** r9 apunta a x0(1,1) **
+	  
+	 xor rdx,rdx
+	 mov edx,r11d; rdx = i
+	 sal rdx,4 ; rdx = i*16
+	 add r8,rdx; r8 incrementado en i posiciones
+	 add r9,rdx; r9 incrementado en i posiciones
 	 inc r11d; incrementamos i
-	 add r8,4;   r8 apunta a segundo elemento de x 
-	 add r9,rcx ;r9 apunta a (N+1) Esima posiciOn
-	 add r9,8;  r9 apunta a (N+3) Esima posiciOn    ,r9 apunta a (N+3) elemento de x0
-	 xor rdx,r11; rdx = i
-	 sal rdx,2 ; rdx = i*4
-	 add r8,rdx; r8 incrementado en 4 posiciones
-	 add r9,rdx; r9 incrementado en 4 posiciones
 	 jmp .ciclo_principal
 	 
 .seguir:
@@ -237,9 +253,9 @@ solver_lin_solve:
 	xor rsi,rsi
 	xor rdx,rdx
 	mov rdi,rbx;rbx <------------ solver , primer parAmetro solver_set_bnd
-	mov rsi,r14;r14d <----------------- b , segundo parAmetro solver_set_bnd
+	mov esi,r14d;r14d <----------------- b , segundo parAmetro solver_set_bnd
 	mov rdx,r13 ;r13 <----------------- x , tercer parAmetro solver_set_bnd
-	call solver_set_bnd; 
+	call solver_set_bnd;            
 
 ;fin de ciclo_k:
 	inc r15; r15 = r15+1
@@ -257,6 +273,7 @@ solver_lin_solve:
 
 
 ;*************************************************************************************************
+
 
 
 global solver_set_bnd
