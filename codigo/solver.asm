@@ -62,15 +62,13 @@ solver_lin_solve:
 	
 	
 ;backups de argumentos iniciales
-	mov rbx, rdi ;                                           ** rbx <------------ solver **
-	mov r12,rcx;                                              ** r12 <--------------- x0 **
-	mov r13, rdx;                                               ** r13 <----------------- x **
-	xor r14,r14
-	mov r14d,esi ;                                              ** r14d <----------------- b **
-    movss [rbp+offset_a],xmm0 ;                      ** rbp+offset_a <------- backup de a **
-    movss [rbp+offset_c],xmm1 ;                      ** rbp+offset_c <------- backup de c **
-    xor r15,r15
-    mov r15,0
+	mov rbx, rdi ;               ** rbx <--- solver **
+	mov r12, rcx ;               ** r12 <--- x0 **
+	mov r13, rdx ;               ** r13 <--- x **
+	mov r14d, esi ;              ** r14d <--- b **
+    movss [rbp+offset_a], xmm0 ; ** rbp+offset_a <--- backup de a **
+    movss [rbp+offset_c], xmm1 ; ** rbp+offset_c <--- backup de c **
+    xor r15, r15
     
 .ciclo_k: ; ciclo externo que itera sobre k desde 0 hasta 19
 	cmp r15,    20 ;                                     
