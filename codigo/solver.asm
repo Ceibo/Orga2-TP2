@@ -53,8 +53,9 @@ solver_lin_solve:
 	push r15; alineada
 	
 	
-	cmp rdi, 0
+	test rdi, rdi ; equivale a cmp rdi, 0 pero la instrucción test es más chica en memoria
 	je .fin
+	
 	;cmp rdx ,0
 	;je .fin
 	;cmp rcx,0
@@ -73,9 +74,9 @@ solver_lin_solve:
 .ciclo_k: ; ciclo externo que itera sobre k desde 0 hasta 19
 	cmp r15,    20 ;                                     
 	je .fin
-	cmp rdx ,0
+	test rdx, rdx ; equivale a cmp rdx, 0
 	je .seguir; si x es NULL entonces saltear ciclo
-	cmp rcx,0
+	test rcx, rcx ; equivale a cmp rcx, 0
 	je .seguir;  si x0 es NULL entonces saltear ciclo
 	
 	mov r8,r13; r8 puntero a x 
@@ -109,7 +110,7 @@ solver_lin_solve:
 	movss xmm1,[rbp+offset_c] ;                  **  xmm1 <---------- c **
 
 ;guarda de condicional: 
-	cmp esi,0
+	test esi, esi ; equivale a cmp esi, 0
 	je .fin; matriz vacIa
 	xor r11,r11 ;
 	mov r11d,1  ;   i en 1                         r11d <---------- i 
