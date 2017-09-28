@@ -42,17 +42,18 @@ solver_lin_solve:
 ; rcx = float* x0
 ; xmm0 = float a ; primeros 4 bytes
 ; xmm1 = float c ; primeros 4 bytes
+
 	push rbp; alineada
-	mov rbp,rsp;
-	sub rsp,8; 
-	push rbx;alineada
-	push r12; 
+	mov rbp, rsp
+	sub rsp, 8
+	push rbx; alineada
+	push r12
 	push r13; alineada
-	push r14; 
-	push r15;  alineada
+	push r14
+	push r15; alineada
 	
 	
-	cmp rdi,0
+	cmp rdi, 0
 	je .fin
 	;cmp rdx ,0
 	;je .fin
@@ -248,13 +249,10 @@ solver_lin_solve:
 	 
 .seguir:
 
-;llamar funciOn solver_set_bnd:
-	xor rdi,rdi
-	xor rsi,rsi
-	xor rdx,rdx
-	mov rdi,rbx;rbx <------------ solver , primer parAmetro solver_set_bnd
-	mov esi,r14d;r14d <----------------- b , segundo parAmetro solver_set_bnd
-	mov rdx,r13 ;r13 <----------------- x , tercer parAmetro solver_set_bnd
+; llamar función solver_set_bnd:
+	mov rdi, rbx  ; rbx  <--- solver, primer parámetro solver_set_bnd
+	mov esi, r14d ; r14d <--- b, segundo parámetro solver_set_bnd
+	mov rdx, r13  ; r13  <--- x, tercer parámetro solver_set_bnd
 	call solver_set_bnd;            
 
 ;fin de ciclo_k:
