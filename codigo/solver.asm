@@ -62,35 +62,27 @@ solver_lin_solve:
     mov r15, 20
     
 .ciclo_k: ; ciclo externo que itera sobre k desde 0 hasta 19
-	mov r8,r13; r8 puntero a x 
-	mov r9, r12 ; r9 puntero a x0
-	xor rdx,rdx
-	xor rax,rax
-	xor r10,r10
-	mov eax,[rdi+offset_N] ; eax = N
-	mov r10d,eax;                               ** r10d <--------  N **
-	inc eax; eax = N+1
-	xor rcx,rcx
-	;mov ecx,4
-	;mul ecx; edx : eax = (N+1)*4
-	;shl rax,32; ** agregado **
-    ;shrd rax,rdx,32;** agregado ** rax = edx:eax
-    sal rax,2 ; rax = (N+1)*4
-    mov rcx,rax;                                 ** rcx <------ (N+1)*4 **
-	xor r11,r11
-	mov r11d,4
-	xor rax,rax
-	mov rax,r10; eax = N
-	div r11d, ; dividimos N por 4,                ***  eax <------ cociente , edx <----- resto *****
-    xor rsi,rsi
-    mov esi,eax; esi backup de cociente
-    inc eax    ;                                 ** eax = (N/4) + 1 **
- 	inc r10d     ;                              **   r10d = N+1  **
-	add r8,4;                                                 ** r8 apunta a x(1,0) **
-	add r9,rcx ;r9 apunta a (N+1) Esima posiciOn
-	add r9,8;  r9 apunta a (N+3) Esima posiciOn                 ** r9 apunta a x0(1,1) **
-	movss xmm0,[rbp+offset_a] ;                 **   xmm0 <----------- a  **
-	movss xmm1,[rbp+offset_c] ;                  **  xmm1 <---------- c **
+	mov r8, r13 ;                                 ** r8 -> x 
+	mov r9, r12 ;                                 ** r9 -> x0
+	mov eax, [rdi+offset_N] ;                     ** rax = N
+	mov r10d, eax ;                               ** r10 = N
+	
+	inc rax ;                                     ** rax = N+1
+    sal rax, 2 ;                                  ** rax = (N+1)*4
+    mov rcx, rax ;                                ** rcx = (N+1)*4
+	
+	mov rax, r10 ;                                ** eax = N
+	sar rax, 2 ;                                  ** rax = N/4
+
+    mov esi, eax ;                                ** esi backup de cociente
+    inc eax ;                                     ** eax = (N/4) + 1
+ 	inc r10 ;                                     ** r10 = N+1
+	add r8, float_size ;                          ** r8 -> x(1,0)
+	add r9, rcx ;                                 ** r9 -> x0(N+1, 0)
+	add r9, 8;  r9 apunta a (N+3) Esima posiciOn   ** r9 apunta a x0(1,1)
+	
+	movss xmm0,[rbp+offset_a] ;                   ** xmm0 = a
+	movss xmm1,[rbp+offset_c] ;                   ** xmm1 = c
 
 ;guarda de condicional: 
 	test esi, esi ; equivale a cmp esi, 0
@@ -220,8 +212,7 @@ solver_lin_solve:
 	 add r8,4;                                                 ** r8 apunta a x(1,0) **
 	 add r9,rcx 
 	 add r9,8;  r9 apunta a (N+3) Esima posiciOn                 ** r9 apunta a x0(1,1) **
-	  
-	 xor rdx,rdx
+	 
 	 mov edx,r11d; rdx = i
 	 sal rdx,4 ; rdx = i*16
 	 add r8,rdx; r8 incrementado en i posiciones
