@@ -35,7 +35,7 @@ solver_lin_solve:
 .ciclo_k: ; ciclo externo que itera sobre k desde 0 hasta 19
   mov r8, r13 ;                                 ** r8 -> x 
   mov r9, r12 ;                                 ** r9 -> x0
-  mov eax, [rdi+offset_N] ;                     ** rax = N
+  mov eax, [rbx+offset_N] ;                     ** rax = N
   mov r10d, eax ;                               ** r10 = N
   
   inc rax ;                                     ** rax = N+1
