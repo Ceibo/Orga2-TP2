@@ -27,7 +27,7 @@ section .text
 ;*************************************************************************************************
 
 
-global solver_lin_solve;        
+;global solver_lin_solve;        
 
 ;extern solver_set_bnd
  
@@ -52,16 +52,6 @@ solver_lin_solve:
 	push r14
 	push r15; alineada
 	
-	
-	test rdi, rdi ; equivale a cmp rdi, 0 pero la instrucción test es más chica en memoria
-	je .fin
-	
-	;cmp rdx ,0
-	;je .fin
-	;cmp rcx,0
-	;je .fin; 
-	
-	
 ;backups de argumentos iniciales
 	mov rbx, rdi ;               ** rbx <--- solver **
 	mov r12, rcx ;               ** r12 <--- x0 **
@@ -69,16 +59,9 @@ solver_lin_solve:
 	mov r14d, esi ;              ** r14d <--- b **
     movss [rbp+offset_a], xmm0 ; ** rbp+offset_a <--- backup de a **
     movss [rbp+offset_c], xmm1 ; ** rbp+offset_c <--- backup de c **
-    xor r15, r15
+    mov r15, 20
     
 .ciclo_k: ; ciclo externo que itera sobre k desde 0 hasta 19
-	cmp r15,    20 ;                                     
-	je .fin
-	test rdx, rdx ; equivale a cmp rdx, 0
-	je .seguir; si x es NULL entonces saltear ciclo
-	test rcx, rcx ; equivale a cmp rcx, 0
-	je .seguir;  si x0 es NULL entonces saltear ciclo
-	
 	mov r8,r13; r8 puntero a x 
 	mov r9, r12 ; r9 puntero a x0
 	xor rdx,rdx
@@ -255,8 +238,9 @@ solver_lin_solve:
 	call solver_set_bnd;            
 
 ;fin de ciclo_k:
-	inc r15; r15 = r15+1
-	jmp .ciclo_k
+	dec r15 ; r15 = r15-1
+	test r15, r15 ; equivale a cmp r15, 0 pero ocupa menos memoria
+    jne .ciclo_k
 	
 .fin:
     pop r15
