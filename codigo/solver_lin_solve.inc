@@ -50,9 +50,6 @@ solver_lin_solve:
 
   lea r8, [r13 + float_size] ;                  ** r8 -> x(1,0)
   lea r9, [r12 + rcx + float_size] ; ** r9 -> x0(1,1)
-  
-  movss xmm0, [rbp + offset_a] ;                ** xmm0 = a
-  movss xmm1, [rbp + offset_c] ;                ** xmm1 = c
 
 ;guarda de condicional: 
   test esi, esi ; equivale a cmp esi, 0
@@ -118,9 +115,9 @@ solver_lin_solve:
    psrldq xmm7, 8 ; xmm7 = . | . |x0(i+3,j)|x0(i+2,j)
    cvtps2pd xmm5, xmm7 ; xmm5 = x0(i+3,j)|x0(i+2,j) ,3er y 4to single xmm7 a 2 double en xmm5
    ;xmm5 contiene 4to y 3er double de fetch x0
-   cvtss2sd xmm7, xmm0
+   cvtss2sd xmm7, [rbp + offset_a]
    ;xmm7 = .|a  , xmm7 es double a
-   cvtss2sd xmm10, xmm1
+   cvtss2sd xmm10, [rbp + offset_c]
    ;xmm10 = .|c  , xmm10 es double c
    
 ;seteamos contador para loop
@@ -167,11 +164,10 @@ solver_lin_solve:
 .fin_de_ciclo_principal:
    
    xor rsi, rsi
-   inc esi ; j en 1 
+   inc rsi ; j en 1 
    
-   lea r8, [r13 + float_size] ;                         ** r8 apunta a x(1,0) **
-   
-   lea r9, [r12 + rcx + float_size] ;        ** r9 apunta a x0(1,1) **
+   lea r8, [r13 + float_size] ;                 ** r8 -> x(1,0) **
+   lea r9, [r12 + rcx + float_size] ;           ** r9 -> x0(1,1) **
    
    mov edx, r11d; rdx = i
    sal rdx, 4 ; rdx = i*16
