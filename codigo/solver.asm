@@ -27,7 +27,7 @@ section .text
 ;*************************************************************************************************
 
 
-global solver_lin_solve;        
+;global solver_lin_solve;        
 
 ;extern solver_set_bnd
  
@@ -42,43 +42,26 @@ solver_lin_solve:
 ; rcx = float* x0
 ; xmm0 = float a ; primeros 4 bytes
 ; xmm1 = float c ; primeros 4 bytes
+
 	push rbp; alineada
-	mov rbp,rsp;
-	sub rsp,8; 
-	push rbx;alineada
-	push r12; 
+	mov rbp, rsp
+	sub rsp, 8
+	push rbx; alineada
+	push r12
 	push r13; alineada
-	push r14; 
-	push r15;  alineada
-	
-	
-	cmp rdi,0
-	je .fin
-	;cmp rdx ,0
-	;je .fin
-	;cmp rcx,0
-	;je .fin; 
-	
+	push r14
+	push r15; alineada
 	
 ;backups de argumentos iniciales
-	mov rbx, rdi ;                                           ** rbx <------------ solver **
-	mov r12,rcx;                                              ** r12 <--------------- x0 **
-	mov r13, rdx;                                               ** r13 <----------------- x **
-	xor r14,r14
-	mov r14d,esi ;                                              ** r14d <----------------- b **
-    movss [rbp+offset_a],xmm0 ;                      ** rbp+offset_a <------- backup de a **
-    movss [rbp+offset_c],xmm1 ;                      ** rbp+offset_c <------- backup de c **
-    xor r15,r15
-    mov r15,0
+	mov rbx, rdi ;               ** rbx <--- solver **
+	mov r12, rcx ;               ** r12 <--- x0 **
+	mov r13, rdx ;               ** r13 <--- x **
+	mov r14d, esi ;              ** r14d <--- b **
+    movss [rbp+offset_a], xmm0 ; ** rbp+offset_a <--- backup de a **
+    movss [rbp+offset_c], xmm1 ; ** rbp+offset_c <--- backup de c **
+    mov r15, 20
     
 .ciclo_k: ; ciclo externo que itera sobre k desde 0 hasta 19
-	cmp r15,    20 ;                                     
-	je .fin
-	cmp rdx ,0
-	je .seguir; si x es NULL entonces saltear ciclo
-	cmp rcx,0
-	je .seguir;  si x0 es NULL entonces saltear ciclo
-	
 	mov r8,r13; r8 puntero a x 
 	mov r9, r12 ; r9 puntero a x0
 	xor rdx,rdx
@@ -110,7 +93,7 @@ solver_lin_solve:
 	movss xmm1,[rbp+offset_c] ;                  **  xmm1 <---------- c **
 
 ;guarda de condicional: 
-	cmp esi,0
+	test esi, esi ; equivale a cmp esi, 0
 	je .fin; matriz vacIa
 	xor r11,r11 ;
 	mov r11d,1  ;   i en 1                         r11d <---------- i 
@@ -248,18 +231,16 @@ solver_lin_solve:
 	 
 .seguir:
 
-;llamar funciOn solver_set_bnd:
-	xor rdi,rdi
-	xor rsi,rsi
-	xor rdx,rdx
-	mov rdi,rbx;rbx <------------ solver , primer parAmetro solver_set_bnd
-	mov esi,r14d;r14d <----------------- b , segundo parAmetro solver_set_bnd
-	mov rdx,r13 ;r13 <----------------- x , tercer parAmetro solver_set_bnd
+; llamar función solver_set_bnd:
+	mov rdi, rbx  ; rbx  <--- solver, primer parámetro solver_set_bnd
+	mov esi, r14d ; r14d <--- b, segundo parámetro solver_set_bnd
+	mov rdx, r13  ; r13  <--- x, tercer parámetro solver_set_bnd
 	call solver_set_bnd;            
 
 ;fin de ciclo_k:
-	inc r15; r15 = r15+1
-	jmp .ciclo_k
+	dec r15 ; r15 = r15-1
+	test r15, r15 ; equivale a cmp r15, 0 pero ocupa menos memoria
+    jne .ciclo_k
 	
 .fin:
     pop r15
