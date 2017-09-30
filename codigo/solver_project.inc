@@ -1,44 +1,113 @@
-global solver_project_asm
-solver_project_asm:
+global solver_project
+solver_project:
 ;void solver_project ( fluid_solver* solver, float * p, float * div )
 ;rdi = fluid_solver* solver
 ;rsi = float* p
-;rdx = float* divpush rbx;
-push r12;
-push r13;
-push r14;
+;rdx = float* div
+
+push rbx
+push r12
+push r13
+push r14
 push r15
 
-mov eax, [rdi + offset_N] ;Tengo en edx el int32 N, tamaño de la matriz
-mov r8d, eax; me guardo el n en r8d
-add r8d, 3; en r8d tengo N+2
-lea rsi, [rsi + r8*float_size] ;VER SI DEJA USAR RSI O HAY QUE USAR UN REGISTRO AUXILIAR
-sub r8d, 3; Vuelvo a tener N en r8d
-mul eax; Toma eax y lo multiplica por lo que hay en eax.
-mov ecx, eax; Para LOOP, pongo (N+2)^2 en ecx
-mov ebx, eax; En ebx guardo (N+2)^2 para preservarlo
-mov eax, [rdi + offset_u]; Pongo en eax el puntero al primer elemento de la matriz u
+mov r13, rdi ;                                r13 -> solver
+mov r14, rsi ;                                r14 -> p 
+mov r15, rdx ;                                r15 -> div
+mov ebx, [r13 + offset_N] ;                   rbx = N
 
-mov r10d, [rdi + offset_v]; Pongo en r10d el puntero al primer elemento de la matriz v
-add r10d, float_size; Ahora apunta al (1,0)(columna, fila)
-add r8d, float_size
-add r8d, float_size; Tengo en r8d N+2
-xor r9, r9;
-mov r9d, [rdi + offset_N]; Acá va el N, que está al principio del stuct
-;add r10d, r8d; Sumo una fila al primer elemento de la matriz v y estoy ahora
-mov r11, rdx; Guardo en r11 el div. Para poder las llamadas de despues 
-mov rax, rsi; Como es void puedo usar el rax, y lo uso para preservar el rsi.
+mov r11d, ebx
+sar r11d, 2 ;                                 r11 = N/4
 
+mov rax, rbx
+mul eax
+mov ecx, eax ;                                rcx = N^2
 
+mov rax, [r13 + offset_v]
+add rax, float_size ;                         rax -> v(1, 0)
 
-mov r12, rdi; En r12 salvo el puntero a solver
-mov r13, rsi; En r13 guardo el puntero a p 
-mov r14, rdx; En r14 guardo el puntero a div
+mov r10, rbx ;                                r10 = N
+inc r10 ;                                     r10 = N+1
+inc r10 ;                                     r10 = N+2
+sal r10, 2 ;                                  r10 = (N+2)*4
 
-xor rax, rax
+lea rdx, [rax + 2*r10] ;                      rdx -> v(1, 2)
 
+mov rdi, [r13 + offset_u]
+add rdi, r10 ;                                rdi -> u(0, 1)
+
+lea rsi, [rdi + 2*float_size] ;               rsi -> u(2, 1)
+
+lea r8, [r15 + r10 + float_size] ;            r8 -> div(1, 1)
+
+lea r9, [r14 + r10 + float_size] ;            r9 -> p(1, 1)
+
+xor r10, r10 ;                                r10 = 0
+
+pxor xmm0, xmm0 ; para blanquear la matriz p
+
+movd xmm1, ebx
+movss xmm2, xmm1
+pslldq xmm2, float_size
+movss xmm2, xmm1
+pslldq xmm2, float_size
+movss xmm2, xmm1
+pslldq xmm2, float_size
+movss xmm2, xmm1 ;                                      xmm2 = N | N | N | N
+movups xmm1, [constante_unmedio_negativo_para_solver] ; xmm1 = -1/2 | -1/2 | -1/2 | -1/2
+divps xmm1, xmm2 ;                                      xmm1 = -1/2N | -1/2N | -1/2N | -1/2N
+; el valor de xmm2 se puede descartar, xmm1 se va a usar en el ciclo1
+
+; Valores antes del ciclo ("->" significa "puntero a")
+; rcx = N^2                            ; para el loop
+; rax -> v(1, 0)                       ; puntero a matriz para ciclo1
+; rdx -> v(1, 2)                       ; puntero a matriz para ciclo1
+; rdi -> u(0, 1)                       ; puntero a matriz para ciclo1
+; rsi -> u(2, 1)                       ; puntero a matriz para ciclo1
+; r8 -> div(1, 1)                      ; puntero a matriz para ciclo1
+; r9 -> p(1, 1)                        ; puntero a matriz para ciclo1
+; r10 = 0                              ; contador de 0 a N/4 para saltar en los bordes
+; r11 = N/4                            ; para comparar con r10
+; rbx = N                              ; no se usa en ciclo1
+; r12                                  ; este registro no fue utilizado
+; r13 -> solver                        ; para preservarlo para llamar a solver_set_bnd
+; r14 -> p                             ; para preservarlo para llamar a solver_set_bnd
+; r15 -> div                           ; para preservarlo para llamar a solver_set_bnd
+; xmm0 = 0 | 0 | 0 | 0                 ; para blanquear la matriz p
+; xmm1 = -1/2N | -1/2N | -1/2N | -1/2N ; para actualizar la matriz div
 .ciclo1:
-call cuerpo_ciclo1
+  ; Blanqueo de matriz p:
+  movdqu [r9], xmm0
+
+  ; Actualización de matriz div:
+  movups xmm2, [rdx]
+  subps xmm2, [rax]
+  addps xmm2, [rdi]
+  subps xmm2, [rsi]
+  mulps xmm2, xmm1
+  movups [r8], xmm2
+
+  ; Si estamos parados en la anteúltima celda de una fila, 
+  ; hay que saltar 3 celdas en lugar de cuatro, por eso hace sub
+  inc r10
+  cmp r10, r11 ; if r10 == N/4
+  jne .end_if
+    xor r10, r10
+    sub rax, float_size
+    sub rdx, float_size
+    sub rdi, float_size
+    sub rsi, float_size
+    sub r8, float_size
+    sub r9, float_size
+  .end_if:
+
+  ; Aumentamos 4 celdas cada puntero
+  sub rax, xmm_size
+  sub rdx, xmm_size
+  sub rdi, xmm_size
+  sub rsi, xmm_size
+  sub r8, xmm_size
+  sub r9, xmm_size
 loop .ciclo1
 
 mov rdx, r12; Restauro rdi para tener el puntero a principio de div para cuando llame
@@ -140,60 +209,4 @@ pop r13
 pop r12
 pop rbx
 
-ret
-
-
-
-
-cuerpo_ciclo1:
-;solver->u[IX(i+1,j)]-solver->u[IX(i-1,j)]
-add eax, float_size; Agrego uno al ciclo
-movups xmm1, [eax]; Tengo en xmm1 los (i+1,j)
-lea eax, [eax - 2*float_size]
-movups xmm2, [eax]; Ahora tengo en xmm2 los (i-1,j)
-subps xmm1, xmm2; Acá tengo solver->u[IX(i+1,j)]-solver->u[IX(i-1,j)] en xmm1
-lea eax, [eax + 4*float_size]; Me muevo 4 posiciones para volver a ejecutar
-; en el primer elemento de la "submatriz" que voy a querer recorrer
-
-movups xmm3, [r10]; Pongo en xmm3 los primeros 4 elementos de la matriz. El (i,j-1)
-lea r10, [r10 + r8*float_size]; Le agrego N+2 a r10d, o sea, bajo una fila
-lea r10, [r10 + r8*float_size]
-movups xmm4, [r10]; Tengo 4 elementos de la matriz pero una fila abajo de los de xmm3. El (i,j+1)
-subps xmm4, xmm3; En xmm4 tengo la diferencia, el resultasdo que quiero
-lea r10d, [r10d + 4*float_size] ;ESTO ME HACE RUIDO
-
-;Ahora tengo en xmm1 y xmm4 los resultados de las cuentas de u y v
-addps xmm1, xmm4; Ahora tengo todo en xmm1, entonces xmm4 está libre tambien ahora
-;Ahora voy a multiplicar xmm1 por -1/2
-mulps xmm1, [constante_unmedio_negativo_para_solver]; Ahora me falta dividirlo por el solver->N (r9d)
-movd xmm6, r9d; Pongo en la derecha supuestamente de xmm6 el N
-pslld xmm6, float_size; shifteo el 
-movd xmm6, r9d;
-pslld xmm6, float_size
-movd xmm6, r9d;
-pslld xmm6, float_size
-movd xmm6, r9d;
-;Y ahora tengo en xmm6 algo así: [N, N, N, N]
-;Ahora divido xmm1 por xmm6
-divps xmm1, xmm6;
-movups [rdx], xmm1
-
-
-
-pxor xmm0, xmm0
-movups [rsi], xmm0
-add r9, float_size; Por que voy a usar xmm y agrrar de a 4 floats
-cmp r8d, eax; Comparo el contador con N+2
-jne .fin
-	xor rax, rax
-	sub rsi, float_size
-	sub eax, float_size
-	sub r10, float_size
-	sub rdx, float_size
-
-.fin:
-add rsi, xmm_size;puntero a p
-add eax, xmm_size;puntero a u
-add r10, xmm_size;puntero a v
-add rdx, xmm_size;puntero a div
 ret

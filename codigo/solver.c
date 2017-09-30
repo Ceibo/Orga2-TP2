@@ -126,7 +126,7 @@ void solver_set_bnd_c ( fluid_solver* solver, uint32_t b, float * x ){
 	x[IX(N+1,N+1)] = 0.5f*(x[IX(N,N+1)]+x[IX(N+1,N)]);
 }
 
-void solver_project ( fluid_solver* solver, float * p, float * div ){
+void solver_project_c ( fluid_solver* solver, float * p, float * div ){
 	uint32_t i, j;
 	FOR_EACH_CELL
 		div[IX(i,j)] = -0.5f*(solver->u[IX(i+1,j)]-solver->u[IX(i-1,j)]+solver->v[IX(i,j+1)]-solver->v[IX(i,j-1)])/solver->N;
