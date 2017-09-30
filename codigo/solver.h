@@ -89,8 +89,10 @@ void solver_add_source ( fluid_solver* solver, float * x, float * s);
 void solver_set_bnd ( fluid_solver* solver, uint32_t b, float * x );
 void solver_set_bnd_c ( fluid_solver* solver, uint32_t b, float * x );
 void solver_lin_solve ( fluid_solver* solver, uint32_t b, float * x, float * x0, float a, float c );
+void solver_lin_solve_c ( fluid_solver* solver, uint32_t b, float * x, float * x0, float a, float c );
 void solver_diffuse ( fluid_solver* solver, uint32_t b, float * x, float * x0);
 void solver_advect ( fluid_solver* solver, uint32_t b, float * d, float * d0, float * u, float * v);
 void solver_project ( fluid_solver* solver, float * p, float * div );
+void solver_project_c ( fluid_solver* solver, float * p, float * div );
 
 #endif

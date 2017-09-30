@@ -1,15 +1,21 @@
 CC=c99
 MACCC=gcc
-CFLAGS= -Wall -Wextra -pedantic -O3 -g -lm -Wno-unused-variable -Wno-unused-parameter
+CFLAGS= -Wall -Wextra -pedantic -O0 -g -lm -Wno-unused-variable -Wno-unused-parameter
 MACFLAGS = -g -lm  -Wno-deprecated
 LIBS = -lGL -lGLU -lglut -lpthread -lm
 MACLIBS = -framework OpenGL -framework GLUT
 NASM=nasm
 NASMFLAGS=-f elf64 -g -F DWARF
 
-all: demo test resultados
+all: demo test_solver_set_bnd test_solver_lin_solve test_solver_project resultados
 
-test: test.c solver_asm.o solver_c.o
+test_solver_set_bnd: test_solver_set_bnd.c solver_asm.o solver_c.o
+	$(CC) $(CFLAGS) $^ -o $@  $(LIBS)
+
+test_solver_lin_solve: test_solver_lin_solve.c solver_asm.o solver_c.o
+	$(CC) $(CFLAGS) $^ -o $@  $(LIBS)
+
+test_solver_project: test_solver_project.c solver_asm.o solver_c.o
 	$(CC) $(CFLAGS) $^ -o $@  $(LIBS)
 
 resultados: resultados.c solver_asm.o solver_c.o
@@ -40,5 +46,5 @@ bmp_mac.o: bmp/bmp.c bmp/bmp.h
 
 clean:
 	rm -f *.o
-	rm -f demo demo_mac
+	rm -f demo demo_mac test_solver_set_bnd test_solver_lin_solve test_solver_project resultados
 
