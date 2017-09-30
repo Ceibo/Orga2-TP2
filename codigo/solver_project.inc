@@ -46,7 +46,7 @@ xor r10, r10 ;                                r10 = 0
 
 pxor xmm0, xmm0 ; para blanquear la matriz p
 
-movd xmm1, ebx
+cvtsi2ss xmm1, ebx ; convierte uint32_t a float
 movss xmm2, xmm1
 pslldq xmm2, float_size
 movss xmm2, xmm1
