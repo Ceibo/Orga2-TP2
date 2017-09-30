@@ -139,5 +139,6 @@ void solver_project_c ( fluid_solver* solver, float * p, float * div ){
 		solver->u[IX(i,j)] -= 0.5f*solver->N*(p[IX(i+1,j)]-p[IX(i-1,j)]);
 		solver->v[IX(i,j)] -= 0.5f*solver->N*(p[IX(i,j+1)]-p[IX(i,j-1)]);
 	END_FOR
-	solver_set_bnd ( solver, 1, solver->u ); solver_set_bnd ( solver, 2, solver->v );
+	solver_set_bnd ( solver, 1, solver->u );
+	solver_set_bnd ( solver, 2, solver->v );
 }

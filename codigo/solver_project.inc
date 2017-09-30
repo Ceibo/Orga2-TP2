@@ -110,35 +110,23 @@ divps xmm1, xmm2 ;                                      xmm1 = -1/2N | -1/2N | -
   sub r9, xmm_size
 loop .ciclo1
 
-mov rdx, r12; Restauro rdi para tener el puntero a principio de div para cuando llame
-;a otras funciones ahora.
-mov rsi, r13; Restauro rsi, el float p, para poder volver a usarlo en otras funciones.
-
-;solver_set_bnd ( solver, 0, div )//solver = rdi, 0 = esi, div = rdx
-;rdi y rdx están ok. Solo tengo que pober esi en 0
-xor rsi, rsi
+mov rdi, r13 ; rdi -> solver
+xor rsi, rsi ; rsi = 0
+mov rdx, r15 ; rdx -> div
 call solver_set_bnd
 
-;solver_set_bnd ( solver, 0, p ). Solver->rdi, 0->esi, p->rdx
-xor rsi, rsi; pongo eci en 0, por las dudas, tendría que ver si solver_set_bnd lo modifica
-mov rdx, r14; Pongo en rdx el original que contenia p, preservado en r14.
-;Ahora puedo llamar a solver_set_bnd tranquilo
+mov rdi, r13 ; rdi -> solver
+xor rsi, rsi ; rsi = 0
+mov rdx, r14 ; rdx -> p
 call solver_set_bnd
 
-
-;solver_lin_solve ( solver, 0, p, div, 1, 4 ) // solver = rdi, 0 = esi(uint32), p = rdx, div = rcx, 1 = xmm0, 4 = xmm1
-;mov rdi, SOLVER
-mov rdi, r12; Por las dudas restauro rdi (solver) al original
-xor rsi, rsi; Pongo esi en 0, por las dudas
-mov rdx, r13; Por las dudas restauro rdx (p)
-mov rdx, r14; Por las dudas restauro rcx (div)
-
-;Esta es otra forma de pasar constantes a los xmm, pero con movd es mas corto.
-mov r9d, 1;
-mov r10d, 4;
-movd xmm0, r9d;
-movd xmm1, r10d;
-;Ahora sí, puedo llamar a solver_lin_solve sin drama
+mov rdi, r13 ; rdi -> solver
+xor rsi, rsi ; rsi = 0
+mov rdx, r14 ; rdx -> p
+mov rcx, r15 ; rcx -> div
+xor r8, r8
+inc r8       ; r8 = 1
+mov r9, 4    ; r9 = 4
 call solver_lin_solve
 
 
@@ -197,11 +185,18 @@ movups [rax], xmm2; LISTO!(esta parte)
 ;Ahora vamos con esto
 ;solver->v[IX(i,j)] -= 0.5f*solver->N*(p[IX(i,j+1)]-p[IX(i,j-1)]);
 ;v->r10, p *en (1,1)->r13. AHORA ME MUEVO POR "FILAS"
-
-
-
-
 loop .ciclo2
+
+mov rdi, r13 ; rdi -> solver
+xor rsi, rsi
+inc rsi      ; rsi = 1
+mov rdx, [r13 + offset_u] ; rdx -> div
+call solver_set_bnd
+
+mov rdi, r13 ; rdi -> solver
+mov rsi, 2   ; rsi = 2
+mov rdx, [r13 + offset_v] ; rdx -> p
+call solver_set_bnd
 
 pop r15
 pop r14
