@@ -1,15 +1,18 @@
 CC=c99
 MACCC=gcc
-CFLAGS= -Wall -Wextra -pedantic -O0 -g -lm -Wno-unused-variable -Wno-unused-parameter
+CFLAGS= -Wall -Wextra -pedantic -O3 -g -lm -Wno-unused-variable -Wno-unused-parameter
 MACFLAGS = -g -lm  -Wno-deprecated
 LIBS = -lGL -lGLU -lglut -lpthread -lm
 MACLIBS = -framework OpenGL -framework GLUT
 NASM=nasm
 NASMFLAGS=-f elf64 -g -F DWARF
 
-all: demo test
+all: demo test resultados
 
 test: test.c solver_asm.o solver_c.o
+	$(CC) $(CFLAGS) $^ -o $@  $(LIBS)
+
+resultados: resultados.c solver_asm.o solver_c.o
 	$(CC) $(CFLAGS) $^ -o $@  $(LIBS)
 
 demo: demo.c solver_c.o solver_asm.o bmp.o

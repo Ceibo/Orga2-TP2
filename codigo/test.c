@@ -3,8 +3,7 @@
 
 void test_solver_set_bnd(uint32_t size, uint32_t b, bool print_values) {
   fluid_solver* solver = solver_create(size, 0.05, 0, 0);
-  solver_set_initial_density(solver);
-
+ 
   float* matrix = (float*) malloc(sizeof(float) * (size+2) * (size+2));
 
   uint32_t i, j, k;
