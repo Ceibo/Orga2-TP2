@@ -7,9 +7,15 @@ MACLIBS = -framework OpenGL -framework GLUT
 NASM=nasm
 NASMFLAGS=-f elf64 -g -F DWARF
 
-all: demo test
+all: demo test_solver_set_bnd test_solver_lin_solve test_solver_project
 
-test: test.c solver_asm.o solver_c.o
+test_solver_set_bnd: test_solver_set_bnd.c solver_asm.o solver_c.o
+	$(CC) $(CFLAGS) $^ -o $@  $(LIBS)
+
+test_solver_lin_solve: test_solver_lin_solve.c solver_asm.o solver_c.o
+	$(CC) $(CFLAGS) $^ -o $@  $(LIBS)
+
+test_solver_project: test_solver_project.c solver_asm.o solver_c.o
 	$(CC) $(CFLAGS) $^ -o $@  $(LIBS)
 
 demo: demo.c solver_c.o solver_asm.o bmp.o
@@ -37,5 +43,5 @@ bmp_mac.o: bmp/bmp.c bmp/bmp.h
 
 clean:
 	rm -f *.o
-	rm -f demo demo_mac test
+	rm -f demo demo_mac test_solver_set_bnd test_solver_lin_solve test_solver_project
 

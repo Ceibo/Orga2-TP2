@@ -1,7 +1,9 @@
 *.o
 demo
 demo_mac
-test
+test_solver_set_bnd
+test_solver_lin_solve
+test_solver_project
 *.pdf
 *.aux
 *.log
