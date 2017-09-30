@@ -2,11 +2,9 @@
 #include "assert.h"
 
 // Constantes
-const float a = 0.3f;
-const float c = 2.8f;
-const long double diferencia_maxima_permitida_en_comparaciones = 0.000001l;
+const long double diferencia_maxima_permitida_en_comparaciones = 0.0001l;
 
-void test_solver_lin_solve(uint32_t size, uint32_t b) {
+void test_solver_lin_solve(uint32_t size, uint32_t b, float a, float c) {
   // Configuración inicial
   fluid_solver* solver = solver_create(size, 0.05, 0, 0);
   solver_set_initial_velocity(solver);
@@ -42,26 +40,48 @@ void test_solver_lin_solve(uint32_t size, uint32_t b) {
 }
 
 int main() {
-  test_solver_lin_solve(4, 0);
-  test_solver_lin_solve(4, 1);
-  test_solver_lin_solve(4, 2);
-  test_solver_lin_solve(16, 0);
-  test_solver_lin_solve(16, 1);
-  test_solver_lin_solve(16, 2);
-  test_solver_lin_solve(32, 0);
-  test_solver_lin_solve(32, 1);
-  test_solver_lin_solve(32, 2);
-  test_solver_lin_solve(64, 0);
-  test_solver_lin_solve(64, 1);
-  test_solver_lin_solve(64, 2);
-  test_solver_lin_solve(128, 0);
-  test_solver_lin_solve(128, 1);
-  test_solver_lin_solve(128, 2);
-  test_solver_lin_solve(256, 0);
-  test_solver_lin_solve(256, 1);
-  test_solver_lin_solve(256, 2);
-  test_solver_lin_solve(512, 0);
-  test_solver_lin_solve(512, 1);
-  test_solver_lin_solve(512, 2);
+  test_solver_lin_solve(4, 0, 0.3f, 2.8f);
+  test_solver_lin_solve(4, 1, 0.3f, 2.8f);
+  test_solver_lin_solve(4, 2, 0.3f, 2.8f);
+  test_solver_lin_solve(16, 0, 0.3f, 2.8f);
+  test_solver_lin_solve(16, 1, 0.3f, 2.8f);
+  test_solver_lin_solve(16, 2, 0.3f, 2.8f);
+  test_solver_lin_solve(32, 0, 0.3f, 2.8f);
+  test_solver_lin_solve(32, 1, 0.3f, 2.8f);
+  test_solver_lin_solve(32, 2, 0.3f, 2.8f);
+  test_solver_lin_solve(64, 0, 0.3f, 2.8f);
+  test_solver_lin_solve(64, 1, 0.3f, 2.8f);
+  test_solver_lin_solve(64, 2, 0.3f, 2.8f);
+  test_solver_lin_solve(128, 0, 0.3f, 2.8f);
+  test_solver_lin_solve(128, 1, 0.3f, 2.8f);
+  test_solver_lin_solve(128, 2, 0.3f, 2.8f);
+  test_solver_lin_solve(256, 0, 0.3f, 2.8f);
+  test_solver_lin_solve(256, 1, 0.3f, 2.8f);
+  test_solver_lin_solve(256, 2, 0.3f, 2.8f);
+  test_solver_lin_solve(512, 0, 0.3f, 2.8f);
+  test_solver_lin_solve(512, 1, 0.3f, 2.8f);
+  test_solver_lin_solve(512, 2, 0.3f, 2.8f);
+
+  test_solver_lin_solve(4, 0, 1.0f, 4.0f);
+  test_solver_lin_solve(4, 1, 1.0f, 4.0f);
+  test_solver_lin_solve(4, 2, 1.0f, 4.0f);
+  test_solver_lin_solve(16, 0, 1.0f, 4.0f);
+  test_solver_lin_solve(16, 1, 1.0f, 4.0f);
+  test_solver_lin_solve(16, 2, 1.0f, 4.0f);
+  test_solver_lin_solve(32, 0, 1.0f, 4.0f);
+  test_solver_lin_solve(32, 1, 1.0f, 4.0f);
+  test_solver_lin_solve(32, 2, 1.0f, 4.0f);
+  test_solver_lin_solve(64, 0, 1.0f, 4.0f);
+  test_solver_lin_solve(64, 1, 1.0f, 4.0f);
+  test_solver_lin_solve(64, 2, 1.0f, 4.0f);
+  test_solver_lin_solve(128, 0, 1.0f, 4.0f);
+  test_solver_lin_solve(128, 1, 1.0f, 4.0f);
+  test_solver_lin_solve(128, 2, 1.0f, 4.0f);
+  test_solver_lin_solve(256, 0, 1.0f, 4.0f);
+  test_solver_lin_solve(256, 1, 1.0f, 4.0f);
+  test_solver_lin_solve(256, 2, 1.0f, 4.0f);
+  test_solver_lin_solve(512, 0, 1.0f, 4.0f);
+  test_solver_lin_solve(512, 1, 1.0f, 4.0f);
+  test_solver_lin_solve(512, 2, 1.0f, 4.0f);
   return 0;
 }
