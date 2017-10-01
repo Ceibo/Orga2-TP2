@@ -5,11 +5,11 @@ solver_project:
 ;rsi = float* p
 ;rdx = float* div
 
-push rbx
+push rbx ; pila alineada
 push r12
-push r13
+push r13 ; pila alineada
 push r14
-push r15
+push r15 ; pila alineada
 
 ; Datos que se preservan en los call
 
@@ -27,23 +27,18 @@ mov rax, rbx
 mul eax
 mov ecx, eax ;                                rcx = N^2
 
-mov rax, [r13 + offset_v]
-add rax, float_size ;                         rax -> v(1, 0)
-
 mov r10, rbx ;                                r10 = N
 inc r10 ;                                     r10 = N+1
 inc r10 ;                                     r10 = N+2
 sal r10, 2 ;                                  r10 = (N+2)*4
 
+mov rax, [r13 + offset_v]
+add rax, float_size ;                         rax -> v(1, 0)
 lea rdx, [rax + 2*r10] ;                      rdx -> v(1, 2)
-
 mov rdi, [r13 + offset_u]
 add rdi, r10 ;                                rdi -> u(0, 1)
-
 lea rsi, [rdi + 2*float_size] ;               rsi -> u(2, 1)
-
 lea r8, [r15 + r10 + float_size] ;            r8 -> div(1, 1)
-
 lea r9, [r14 + r10 + float_size] ;            r9 -> p(1, 1)
 
 xor r10, r10 ;                                r10 = 0
@@ -72,7 +67,7 @@ divps xmm1, xmm2 ;                                      xmm1 = -1/2N | -1/2N | -
 ; r9 -> p(1, 1)                        ; puntero a matriz para ciclo1
 ; r10 = 0                              ; contador de 0 a N/4 para saltar en los bordes
 ; r11 = N/4                            ; para comparar con r10
-; rbx = N                              ; no hace falta preservarlo pero se usa en la Configuración inicial
+; rbx = N                              ; no hace falta preservarlo pero se usa en la configuración inicial
 ; r12                                  ; este registro no fue utilizado
 ; r13 -> solver                        ; para preservarlo para llamar a solver_set_bnd
 ; r14 -> p                             ; para preservarlo para llamar a solver_set_bnd
@@ -85,33 +80,36 @@ divps xmm1, xmm2 ;                                      xmm1 = -1/2N | -1/2N | -
 
   ; Actualización de matriz div:
   movups xmm2, [rdx]
-  subps xmm2, [rax]
-  addps xmm2, [rdi]
-  subps xmm2, [rsi]
+  movups xmm3, [rax]
+  subps xmm2, xmm3
+  movups xmm3, [rdi]
+  addps xmm2, xmm3
+  movups xmm3, [rsi]
+  subps xmm2, xmm3
   mulps xmm2, xmm1
   movups [r8], xmm2
 
-  ; Si estamos parados en la anteúltima celda de una fila, 
-  ; hay que saltar 3 celdas en lugar de cuatro, por eso hace sub
+  ; Aumentamos 4 celdas cada puntero
+  add rax, xmm_size
+  add rdx, xmm_size
+  add rdi, xmm_size
+  add rsi, xmm_size
+  add r8, xmm_size
+  add r9, xmm_size
+
+  ; Si estamos parados en la última celda de una fila, 
+  ; hay que saltar 2 celdas más para saltar el borde
   inc r10
   cmp r10, r11 ; if r10 == N/4
   jne .end_if_0
     xor r10, r10
-    sub rax, float_size
-    sub rdx, float_size
-    sub rdi, float_size
-    sub rsi, float_size
-    sub r8, float_size
-    sub r9, float_size
+    add rax, 2*float_size
+    add rdx, 2*float_size
+    add rdi, 2*float_size
+    add rsi, 2*float_size
+    add r8, 2*float_size
+    add r9, 2*float_size
   .end_if_0:
-
-  ; Aumentamos 4 celdas cada puntero
-  sub rax, xmm_size
-  sub rdx, xmm_size
-  sub rdi, xmm_size
-  sub rsi, xmm_size
-  sub r8, xmm_size
-  sub r9, xmm_size
 loop .ciclo1
 
 ; Llamados a funciones
@@ -151,17 +149,11 @@ sal r10, 2 ;                                  r10 = (N+2)*4
 
 mov rax, [r13 + offset_v]
 lea rax, [rax + r10 + 2*float_size] ;         rax -> v(1, 1)
-
-
 mov rdx, [r13 + offset_u]
 lea rdx, [rdx + r10 + 2*float_size] ;         rdx -> u(1, 1)
-
 lea rdi, [r14 + float_size] ;                 rdi -> p(1, 0)
-
 lea rsi, [r14 + 2*r10 + float_size] ;         rsi -> p(1, 2)
-
 lea r8, [r14 + float_size] ;                  r8 -> p(0, 1)
-
 lea r9, [r14 + 2*r10 + float_size] ;          r9 -> p(2, 1)
 
 xor r10, r10 ;                                r10 = 0
@@ -188,7 +180,7 @@ mulps xmm0, xmm1 ;                                      xmm0 = -N/2 | -N/2 | -N/
 ; r9 -> p(2, 1)                        ; puntero a matriz para ciclo1
 ; r10 = 0                              ; contador de 0 a N/4 para saltar en los bordes
 ; r11 = N/4                            ; para comparar con r10
-; rbx = N                              ; no hace falta preservarlo pero se usa en la Configuración inicial
+; rbx = N                              ; no hace falta preservarlo pero se usa en la configuración inicial
 ; r12                                  ; este registro no fue utilizado
 ; r13 -> solver                        ; para preservarlo para llamar a solver_set_bnd
 ; r14 -> p                             ; para preservarlo para llamar a solver_set_bnd
@@ -199,39 +191,43 @@ mulps xmm0, xmm1 ;                                      xmm0 = -N/2 | -N/2 | -N/
 .ciclo2:
   ; Actualización de matriz u:
   movups xmm1, [r9]
-  subps xmm1, [r8]
+  movups xmm2, [r8]
+  subps xmm1, xmm2
   mulps xmm1, xmm0
-  addps xmm1, [rdx]
+  movups xmm2, [rdx]
+  addps xmm1, xmm2
   movups [rdx], xmm1
 
   ; Actualización de matriz v:
   movups xmm1, [rsi]
-  subps xmm1, [rdi]
+  movups xmm2, [rdi]
+  subps xmm1, xmm2
   mulps xmm1, xmm0
-  addps xmm1, [rax]
+  movups xmm2, [rax]
+  addps xmm1, xmm2
   movups [rax], xmm1
 
-  ; Si estamos parados en la anteúltima celda de una fila, 
-  ; hay que saltar 3 celdas en lugar de cuatro, por eso hace sub
+  ; Aumentamos 4 celdas cada puntero
+  add rax, xmm_size
+  add rdx, xmm_size
+  add rdi, xmm_size
+  add rsi, xmm_size
+  add r8, xmm_size
+  add r9, xmm_size
+
+  ; Si estamos parados en la última celda de una fila, 
+  ; hay que saltar 2 celdas más para saltar el borde
   inc r10
   cmp r10, r11 ; if r10 == N/4
   jne .end_if_1
     xor r10, r10
-    sub rax, float_size
-    sub rdx, float_size
-    sub rdi, float_size
-    sub rsi, float_size
-    sub r8, float_size
-    sub r9, float_size
+    add rax, 2*float_size
+    add rdx, 2*float_size
+    add rdi, 2*float_size
+    add rsi, 2*float_size
+    add r8, 2*float_size
+    add r9, 2*float_size
   .end_if_1:
-
-  ; Aumentamos 4 celdas cada puntero
-  sub rax, xmm_size
-  sub rdx, xmm_size
-  sub rdi, xmm_size
-  sub rsi, xmm_size
-  sub r8, xmm_size
-  sub r9, xmm_size
 loop .ciclo2
 
 mov rdi, r13 ; rdi -> solver
