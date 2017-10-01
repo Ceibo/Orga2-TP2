@@ -233,12 +233,12 @@ loop .ciclo2
 mov rdi, r13 ; rdi -> solver
 xor rsi, rsi
 inc rsi      ; rsi = 1
-mov rdx, [r13 + offset_u] ; rdx -> div
+mov rdx, [r13 + offset_u] ; rdx -> u
 call solver_set_bnd
 
 mov rdi, r13 ; rdi -> solver
 mov rsi, 2   ; rsi = 2
-mov rdx, [r13 + offset_v] ; rdx -> p
+mov rdx, [r13 + offset_v] ; rdx -> v
 call solver_set_bnd
 
 pop r15
