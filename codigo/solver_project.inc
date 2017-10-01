@@ -53,7 +53,7 @@ pslldq xmm2, float_size
 movss xmm2, xmm1
 pslldq xmm2, float_size
 movss xmm2, xmm1 ;                                      xmm2 = N | N | N | N
-movups xmm1, [constante_unmedio_negativo_para_solver] ; xmm1 = -1/2 | -1/2 | -1/2 | -1/2
+movups xmm1, [dquad_con_cuatro_float_de_valor_un_medio_negativo] ; xmm1 = -1/2 | -1/2 | -1/2 | -1/2
 divps xmm1, xmm2 ;                                      xmm1 = -1/2N | -1/2N | -1/2N | -1/2N
 ; el valor de xmm2 se puede descartar, xmm1 se va a usar en el ciclo1
 
@@ -79,13 +79,13 @@ divps xmm1, xmm2 ;                                      xmm1 = -1/2N | -1/2N | -
   movdqu [r9], xmm0
 
   ; Actualización de matriz div:
-  movups xmm2, [rdx]
-  movups xmm3, [rax]
-  subps xmm2, xmm3
-  movups xmm3, [rdi]
-  addps xmm2, xmm3
-  movups xmm3, [rsi]
-  subps xmm2, xmm3
+  movups xmm2, [rdx] ; xmm2 = v(i, j+1)
+  movups xmm3, [rax] ; xmm3 = v(i, j-1)
+  subps xmm2, xmm3   ; xmm2 = v(i, j+1) - v(i, j-1)
+  movups xmm3, [rsi] ; xmm3 = u(i+1, j)
+  addps xmm2, xmm3   ; xmm2 = v(i, j+1) - v(i, j-1) + u(i+1, j)
+  movups xmm3, [rdi] ; xmm3 = u(i-1, j)
+  subps xmm2, xmm3   ; xmm2 = v(i, j+1) - v(i, j-1) + u(i+1, j) - u(i-1, j)
   mulps xmm2, xmm1
   movups [r8], xmm2
 
@@ -124,13 +124,12 @@ xor rsi, rsi ; rsi = 0
 mov rdx, r14 ; rdx -> p
 call solver_set_bnd
 
-mov rdi, r13 ; rdi -> solver
-xor rsi, rsi ; rsi = 0
-mov rdx, r14 ; rdx -> p
-mov rcx, r15 ; rcx -> div
-xor r8, r8
-inc r8       ; r8 = 1
-mov r9, 4    ; r9 = 4
+mov rdi, r13                       ; rdi -> solver
+xor rsi, rsi                       ; rsi = 0
+mov rdx, r14                       ; rdx -> p
+mov rcx, r15                       ; rcx -> div
+mov r8, [dword_float_valor_uno]    ; r8 = 1.0f
+mov r9, [dword_float_valor_cuatro] ; r9 = 4.0f
 call solver_lin_solve
 
 ; Configuración inicial para el ciclo 2
@@ -166,7 +165,7 @@ pslldq xmm1, float_size
 movss xmm1, xmm0
 pslldq xmm1, float_size
 movss xmm1, xmm0 ;                                      xmm1 = N | N | N | N
-movups xmm0, [constante_unmedio_negativo_para_solver] ; xmm0 = -1/2 | -1/2 | -1/2 | -1/2
+movups xmm0, [dquad_con_cuatro_float_de_valor_un_medio_negativo] ; xmm0 = -1/2 | -1/2 | -1/2 | -1/2
 mulps xmm0, xmm1 ;                                      xmm0 = -N/2 | -N/2 | -N/2 | -N/2
 ; el valor de xmm1 se puede descartar, xmm0 se va a usar en el ciclo2
 
@@ -185,17 +184,16 @@ mulps xmm0, xmm1 ;                                      xmm0 = -N/2 | -N/2 | -N/
 ; r13 -> solver                        ; para preservarlo para llamar a solver_set_bnd
 ; r14 -> p                             ; para preservarlo para llamar a solver_set_bnd
 ; r15 -> div                           ; para preservarlo para llamar a solver_set_bnd
-; xmm0 = 0 | 0 | 0 | 0                 ; para blanquear la matriz p
-; xmm1 = -1/2N | -1/2N | -1/2N | -1/2N ; para actualizar la matriz div
+; xmm0 = -N/2 | -N/2 | -N/2 | -N/2     ; para actualizar las matrices u y v
 
 .ciclo2:
   ; Actualización de matriz u:
-  movups xmm1, [r9]
-  movups xmm2, [r8]
-  subps xmm1, xmm2
-  mulps xmm1, xmm0
-  movups xmm2, [rdx]
-  addps xmm1, xmm2
+  movups xmm1, [r9]  ; xmm1 = p(i+1, j)
+  movups xmm2, [r8]  ; xmm2 = p(i-1, j)
+  subps xmm1, xmm2   ; xmm1 = p(i+1, j) - p(i-1, j)
+  mulps xmm1, xmm0   ; xmm1 = -N/2*[p(i+1, j) - p(i-1, j)]
+  movups xmm2, [rdx] ; xmm2 = u(i, j)
+  addps xmm1, xmm2   ; xmm1 = u(i, j) -N/2*[p(i+1, j) - p(i-1, j)]
   movups [rdx], xmm1
 
   ; Actualización de matriz v:

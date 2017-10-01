@@ -134,7 +134,7 @@ void solver_project_c ( fluid_solver* solver, float * p, float * div ){
 	END_FOR	
 	solver_set_bnd ( solver, 0, div );
 	solver_set_bnd ( solver, 0, p );
-	solver_lin_solve ( solver, 0, p, div, 1, 4 );
+	solver_lin_solve ( solver, 0, p, div, 1.0f, 4.0f );
 	FOR_EACH_CELL
 		solver->u[IX(i,j)] -= 0.5f*solver->N*(p[IX(i+1,j)]-p[IX(i-1,j)]);
 		solver->v[IX(i,j)] -= 0.5f*solver->N*(p[IX(i,j+1)]-p[IX(i,j-1)]);
