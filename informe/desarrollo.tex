@@ -1,33 +1,47 @@
 El código fuente de la simulación está escrito en lenguaje C y el compilador utilizado es GCC. Para las funciones de C \textit{solver\_lin\_solve}, \textit{solver\_set\_bnd} y \textit{solver\_project} hicimos implementaciones alternativas escritas en el lenguaje ensamblador de la familia de procesadores Intel x86-64. Las instrucciones vectoriales en lenguaje ensamblador utilizan registros de 128 bits. Los estados de la simulación se representan mediante matrices de números decimales de punto flotante de precisión simple (32 bits). Los algoritmos asumen que todas las matrices en una ejecución particular constan de $n\ +\ 2$ filas y $n\ +\ 2$ columnas con $n\ \geq\ 4$ y $n$ múltiplo de 4. A continuación se explica la implementación en ensamblador de las tres funciones.
 \subsection{Función solver\_lin\_solve}
- El ciclo principal está formado por dos ciclos: un ciclo que recorre las columnas de las matrices y
+ El ciclo principal de la función está formado por dos ciclos: un ciclo que recorre las columnas de las matrices y
  otro ciclo que recorre las filas. A causa de que las matrices contienen dimensiones múltiplos de 
  cuatro, sin contar con las filas y columnas borde que no se usan en esta función, y los elementos
- de las matrices ocupan 4 bytes hemos decidido fetchear de a cuatro elementos consecutivos
- de una fila, fetchear es cargar de memoria, para aprovechar el espacio de los registros $xmm$, que es
- de 16 bytes y por lo tanto podemos cargar 4 elementos en un solo fetch. Así el índice de
- las columnas, $i$, queda en un rango entre 1 y $N/4$, donde cada incremento de $i$ representa avance de a 4 columnas. El ciclo sobre columnas es el primero.  
+ de las matrices ocupan 4 bytes hemos decidido fetchear, fetchear es cargar de memoria, de a cuatro elementos consecutivos
+ de una fila para aprovechar el espacio de los registros $xmm$, que es
+ de 16 bytes, y por lo tanto podemos cargar cuatro elementos en un solo fetch. Así el índice de
+ las columnas, $i$, queda en un rango entre 1 y $N/4$, donde cada incremento de $i$ representa avance de a cuatro columnas. El ciclo sobre columnas es el primero.  
  Adentro tenemos otro ciclo donde se recorren las filas de a una. 
 
 Empezamos cargando desde matriz $x$.
  En cada iteración sobre fila se chequea si la fila es la primera, tal que si es así entonces 
- se realiza $1er$ fetch de 4 elementos consecutivos en un $xmm$ llamado $xmm\_piso$. Si no es la 
+ se realiza $1er$ fetch de cuatro elementos consecutivos desde matriz $x$ en un $xmm$ llamado $xmm\_piso$. Si no es la 
  primera entonces se copian de un registro $xmm$, llamado $xmm\_backup$, que contiene los 
- resultados de ciclo anterior.
-Luego realizamos $2do$ fetch de a 4 de una fila siguiente, en un $xmm$ llamado
- $xmm\_left$ y avanzamos 2 posiciones para un $3er$ fetch de a 4 en un $xmm$ llamado $xmm\_medio\_y\_right$.
- En la siguiente fila fetcheamos de a 4 en un $xmm$ llamado $xmm\_techo$. Los elementos cargados desde $x$
- forman un bloque de elementos (ver figura) de donde vamos a obtener 4 resultados a partir de 6 
+ cuatro resultados de ciclo anterior.
+Luego realizamos $2do$ fetch de a cuatro de una fila siguiente, en un $xmm$ llamado
+ $xmm\_left$ y avanzamos dos posiciones para un $3er$ fetch de a cuatro en un $xmm$ llamado $xmm\_right$.
+ En la siguiente fila fetcheamos de a cuatro en un $xmm$ llamado $xmm\_techo$. Los elementos cargados desde $x$
+ forman un bloque de elementos (ver figura 1 $(a)$) de donde vamos a obtener cuatro resultados a partir de seis
  accesos a memoria.
- Por otra parte de matriz $x0$ fetcheamos 4 elementos consecutivos en un $xmm$ llamado $xmm\_x0$.
+ Por otra parte de matriz $x0$ fetcheamos cuatro elementos consecutivos en un $xmm$ llamado $xmm\_x0$.
 
- Una vez que tenemos los datos desempaquetamos con instrucción $cvtps2pd$, que convierte los single
+Representamos en figura 1 $(c)$ los sumandos de matriz $x$ que aparecen en cuerpo de ciclo principal 
+ en código $c$ (figura 2):
+ up representa al sumando $x[IX(i,j+1)]$, down a $x[IX(i,j-1)]$, left a $x[IX(i-1,j)$ y right a 
+ $x[IX(i+1,j)]$. Por último middle representa a sumando $x0[IX(i,j)]$. En bloque de figura 1 $(a)$ vemos que $xmm\_techo$ empaca a los cuatro sumandos up, $xmm\_piso$
+  empaca a los cuatro down y $xmm\_right$ empaca a los cuatro right de los cuatro puntos centrales del bloque. También vemos, en figura 1 $(b)$, que $xmm\_x0$ empaca a los cuatro middle asociados a los puntos centrales del bloque.
+  La idea que usamos para paralelizar cálculos es sumar los valores de los registros $xmm\_piso$,
+  $xmm\_techo$ y $xmm\_right$ en paralelo obteniendo cuatro sumas parciales.
+  Luego completar la suma alrededor de un punto individualmente, a causa de dependencia de
+  vecino izquierdo, sumando up, down, left y right, comenzando con entorno de primero de los cuatro puntos
+  centrales. Terminar las operaciones sobre ese punto, usando primer middle empaquetado en $xmm\_x0$, y pasar a operar sobre vecino derecho 
+  usando como sumando left de este al resultado obtenido.
+  De esta forma se respeta el código $c$ en donde sobre una fila de $x$ los 
+ puntos se actualizan hacia derecha, es decir que dependen de sus vecinos izquierdos.
+  
+ Volviendo al cuerpo del ciclo, una vez que tenemos los datos desempaquetamos con instrucción $cvtps2pd$, que convierte los single
  en parte baja de $xmm$ fuente a double en $xmm$ destino. Luego shifteamos a derecha con $psrldq$ para
  acceder a los single de parte alta de los $xmm$ y convertirlos a double. En este paso obtenemos 
  $xmm\_piso\_low$ y $xmm\_piso\_high$ que corresponden a desempacar a double los 2 single en parte baja y los 
  2 single en parte alta de $xmm\_piso$ respectivamente.
-Repetimos este procedimiento con $xmm\_medio\_y\_right$ obteniendo 
- $xmm\_medio\_y\_right\_low$ y $xmm\_medio\_y\_right\_high$. De misma manera desempaquetamos 
+Repetimos este procedimiento con $xmm\_right$ obteniendo 
+ $xmm\_right\_low$ y $xmm\_right\_high$. De misma manera desempaquetamos 
  $xmm\_techo$ en $xmm\_techo\_low$ y $xmm\_techo\_high$.
  Por otra parte se convierten los singles $a$ y $c$ a double en $xmm\_a$ y $xmm\_b$ con instrucción
  $cvtss2sd$, que convierte escalar single de parte menos significativa de $xmm$ fuente a
@@ -37,28 +51,29 @@ Repetimos este procedimiento con $xmm\_medio\_y\_right$ obteniendo
  de parte menos significativa de $xmm$ fuente a double en parte baja de $xmm$ destino. Se guarda esto en
  $xmm\_res$, que usaremos como contenedor de resultados finales.
 
-Siguiente paso se suman los 2 double de $xmm\_techo\_low$ y $xmm\_medio\_y\_right\_low$ guardándose en un $ xmm$. 
-Luego a estos 2 doubles resultado de suma entre techo y lado derecho les sumamos los 2 doubles
- en $xmm\_piso\_low$ obteniendo sumas parciales $x[IX(i+1,j)]+x[IX(i,j-1)]+x[IX(i,j+1)]$ de 2 puntos de $x$.
+Siguiente paso se suman los dos double de $xmm\_techo\_low$ y $xmm\_right\_low$ guardándose en un $ xmm$ temporal. 
+Luego a estos dos doubles resultado de suma entre techo y lado derecho les sumamos los dos doubles
+ en $xmm\_piso\_low$ obteniendo sumas parciales $x[IX(i+1,j)]+x[IX(i,j-1)]+x[IX(i,j+1)]$ de entorno de dos puntos de $x$.
  Guardamos esto en $xmm$ llamado $xmm\_sum\_parcial\_low$ y repetimos procedimiento con los $xmm$
- de partes altas: $xmm\_techo\_high$, $xmm\_piso\_high$ y $xmm\_medio\_y\_right\_high$. Guardamos
- estos resultados en $xmm\_sum\_parcial\_high$ asociados a otros 2 puntos de $x$.
+ de partes altas: $xmm\_techo\_high$, $xmm\_piso\_high$ y $xmm\_right\_high$. Guardamos
+ estos resultados en $xmm\_sum\_parcial\_high$ asociados a otros dos puntos de $x$.
 
    Paso siguiente entramos en ciclo que se repite
- 4 veces operando sobre doubles de parte baja y obteniendo en cada iteración un resultado a guardar 
+ cuatro veces operando sobre doubles de parte baja y obteniendo en cada iteración un resultado a guardar 
  en matriz $x$. Primero se suman escalar de $xmm\_res$ con double en parte baja de 
  alguno de los $xmm\_sum\_parcial$ con instrucción $addsd$ que suma escalares doubles, obteniéndose 
   $x[IX(i-1,j)]+x[IX(i+1,j)]+x[IX(i,j-1)]+x[IX(i,j+1)]$, y guardándose en $xmm\_res$. Entonces se
  multiplica con escalar $xmm\_a$ usando instrucción $mulsd$, que multiplica escalares double,
  obteniéndose $a*(x[IX(i-1,j)]+x[IX(i+1,j)]+x[IX(i,j-1)]+x[IX(i,j+1)]) $ y lo guardamos en $xmm\_res$.
-Luego a $xmm\_res$ le sumamos double en parte baja de $xmm\_x0$ obteniendo 
+Luego le sumamos double en parte baja de $xmm\_x0$ obteniendo 
  $x0[IX(i,j)] + a*(x[IX(i-1,j)]+x[IX(i+1,j)]+x[IX(i,j-1)]+x[IX(i,j+1)])$ y lo guardamos en $xmm\_res$.
  Paso seguido dividimos $xmm\_res$ por escalar $xmm\_c$ con instrucción $divsd$, que divide escalares
  double, obteniendo $(x0[IX(i,j)] + a*(x[IX(i-1,j)]+x[IX(i+1,j)]+x[IX(i,j-1)]+x[IX(i,j+1)]))/c$
- y lo guardamos en $xmm\_res$. De esta forma se respeta el código $c$, en donde sobre una fila de $x$ los 
- puntos se actualizan hacia derecha, es decir que dependen de sus vecinos izquierdos, ya que en la 
- primera de estas 4 iteraciones se usa $xmm\_res$ cargado desde $x$ pero en las siguientes $xmm\_res$ está
- cargado con valor obtenido en anterior iteración. Finalmente convertimos el resultado en $xmm\_res$ 
+ y lo guardamos en $xmm\_res$. En primer iteración $xmm\_res$ contiene sumando left de $1er$ punto central de bloque 
+en figura 1 y al sumar con escalar en parte baja de $xmm\_sum\_parcial\_low$ obtenemos suma de up, low, right y left 
+para ese punto. Realizamos las operaciones restantes y guardamos este resultado en $xmm\_res$ para ser
+usado como sumando left en siguiente iteración.
+Finalmente convertimos el resultado en $xmm\_res$ 
  de double a single con instrucción $cvtsd2ss$ y lo movemos a $xmm\_backup$ con instrucción $movss$, que
  mueve un escalar single a parte baja de $xmm$ destino. 
 Una vez guardado resultado en $xmm\_backup$ shifteamos este registro a izquierda con instrucción
@@ -68,15 +83,15 @@ Una vez guardado resultado en $xmm\_backup$ shifteamos este registro a izquierda
  $xmm\_sum\_parcial\_low$ y $xmm\_x0\_low$ a derecha, con $psrldq$, para acceder a las partes altas de estos y, en caso de haber usado los dos doubles de cada registro pasamos a operar con $xmm\_sum\_parcial\_high$ y 
  $xmm\_x0\_high$.
 
-Luego de salir de este ciclo de 4 iteraciones tenemos en $xmm\_backup$ los 4 resultados a subir en 
+Luego de salir de este ciclo de cuatro iteraciones tenemos en $xmm\_backup$ los cuatro resultados a subir en 
  matriz $x$ pero con las posiciones invertidas por como se cargaron en las iteraciones. Entonces
  intercambiamos sus posiciones con instrucción $pshufd$ que reubica doublewords en destino con 
- ayuda de un registro temporal. Una vez hecho esto guardamos estos 4 resultados en matriz $x$, con instrucción movups, y 
+ ayuda de un registro temporal. Una vez hecho esto guardamos estos cuatro resultados en matriz $x$, con instrucción $movups$, y 
  saltamos a siguiente fila terminando una iteración de ciclo sobre filas. En próxima iteración
- no tenemos que cargar de memoria los 4 resultados obtenidos, ya que los tenemos guardados en
+ no tenemos que cargar de memoria los cuatro resultados obtenidos, ya que los tenemos guardados en
  $xmm\_backup$, que sobreescribieron fila de $x$ y son requeridos.
  Al iterar sobre $N$ filas terminamos una iteración de ciclo principal y avanzamos a las 
- siguientes 4 columnas de $x$ y $x0$. Una vez iterado $N/4$ veces ciclo principal salimos de este con bloque de 
+ siguientes cuatro columnas de $x$ y $x0$. Una vez iterado $N/4$ veces ciclo principal salimos de este con bloque de 
  $N\times N$ de $x$ actualizado.
 
 \subsection{Función solver\_set\_bnd}
