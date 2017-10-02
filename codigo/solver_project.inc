@@ -26,6 +26,7 @@ sar r11d, 2 ;                                 r11 = N/4
 mov rax, rbx
 mul eax
 mov ecx, eax ;                                rcx = N^2
+sar rcx, 2 ;                                  rcx = (N^2)/4
 
 mov r10, rbx ;                                r10 = N
 inc r10 ;                                     r10 = N+1
@@ -58,7 +59,7 @@ divps xmm1, xmm2 ;                                      xmm1 = -1/2N | -1/2N | -
 ; el valor de xmm2 se puede descartar, xmm1 se va a usar en el ciclo1
 
 ; Valores antes del ciclo ("->" significa "puntero a")
-; rcx = N^2                            ; para el loop
+; rcx = (N^2)/4                        ; para el loop
 ; rax -> v(1, 0)                       ; puntero a matriz para ciclo1
 ; rdx -> v(1, 2)                       ; puntero a matriz para ciclo1
 ; rdi -> u(0, 1)                       ; puntero a matriz para ciclo1
@@ -140,6 +141,7 @@ sar r11d, 2 ;                                 r11 = N/4
 mov rax, rbx
 mul eax
 mov ecx, eax ;                                rcx = N^2
+sar ecx, 2 ;                                  rcx = (N^2)/4 ; proceso de a 4 elementos
 
 mov r10, rbx ;                                r10 = N
 inc r10 ;                                     r10 = N+1
@@ -170,7 +172,7 @@ mulps xmm0, xmm1 ;                                      xmm0 = -N/2 | -N/2 | -N/
 ; el valor de xmm1 se puede descartar, xmm0 se va a usar en el ciclo2
 
 ; Valores antes del ciclo ("->" significa "puntero a")
-; rcx = N^2                            ; para el loop
+; rcx = (N^2)/4                        ; para el loop
 ; rax -> v(1, 1)                       ; puntero a matriz para ciclo1
 ; rdx -> u(1, 1)                       ; puntero a matriz para ciclo1
 ; rdi -> p(1, 0)                       ; puntero a matriz para ciclo1
