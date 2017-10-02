@@ -38,14 +38,23 @@ void test_solver_project(uint32_t size, uint32_t b) {
   solver_project_c(solver_c, p_c, div_c);
   solver_project(solver_asm, p_asm, div_asm);
 
+  float max_dif = 0;
+  float aux;
+
   for (i = 0; i < (size+2); ++i) {
     for (j = 0; j < (size+2); ++j) {
-      assert(fabs(p_c[IXX(i, j)] - p_asm[IXX(i, j)]) <= diferencia_maxima_permitida_en_comparaciones);
-      assert(fabs(div_c[IXX(i, j)] - div_asm[IXX(i, j)]) <= diferencia_maxima_permitida_en_comparaciones);
-      assert(fabs(solver_c->u[IXX(i, j)] - solver_asm->u[IXX(i, j)]) <= diferencia_maxima_permitida_en_comparaciones);
-      assert(fabs(solver_c->v[IXX(i, j)] - solver_asm->v[IXX(i, j)]) <= diferencia_maxima_permitida_en_comparaciones);
+      assert((aux = fabs(p_c[IXX(i, j)] - p_asm[IXX(i, j)])) <= diferencia_maxima_permitida_en_comparaciones);
+      max_dif = aux > max_dif ? aux : max_dif;
+      assert((aux = fabs(div_c[IXX(i, j)] - div_asm[IXX(i, j)])) <= diferencia_maxima_permitida_en_comparaciones);
+      max_dif = aux > max_dif ? aux : max_dif;
+      assert((aux = fabs(solver_c->u[IXX(i, j)] - solver_asm->u[IXX(i, j)])) <= diferencia_maxima_permitida_en_comparaciones);
+      max_dif = aux > max_dif ? aux : max_dif;
+      assert((aux = fabs(solver_c->v[IXX(i, j)] - solver_asm->v[IXX(i, j)])) <= diferencia_maxima_permitida_en_comparaciones);
+      max_dif = aux > max_dif ? aux : max_dif;
     }
   }
+
+  printf("Tamaño de la matriz: %i. La diferencia máxima es: %f\n", size, max_dif);
 
   // Limpieza
   solver_destroy(solver_c);
@@ -57,6 +66,7 @@ void test_solver_project(uint32_t size, uint32_t b) {
 }
 
 int main() {
+  printf("Máximo error permitido: %Lf\n", diferencia_maxima_permitida_en_comparaciones);
   test_solver_project(4, 1);
   test_solver_project(4, 2);
   test_solver_project(4, 3);
@@ -78,5 +88,6 @@ int main() {
   test_solver_project(512, 1);
   test_solver_project(512, 2);
   test_solver_project(512, 3);
+  printf("TEST APROBADO\n");
   return 0;
 }

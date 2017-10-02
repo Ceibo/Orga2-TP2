@@ -80,13 +80,13 @@ divps xmm1, xmm2 ;                                                 xmm1 = -1/2N 
   movdqu [r9], xmm0
 
   ; Actualización de matriz div:
-  movups xmm2, [rdx] ; xmm2 = v(i, j+1)
-  movups xmm3, [rax] ; xmm3 = v(i, j-1)
-  subps xmm2, xmm3   ; xmm2 = v(i, j+1) - v(i, j-1)
-  movups xmm3, [rsi] ; xmm3 = u(i+1, j)
-  addps xmm2, xmm3   ; xmm2 = v(i, j+1) - v(i, j-1) + u(i+1, j)
+  movups xmm2, [rsi] ; xmm2 = u(i+1, j)
   movups xmm3, [rdi] ; xmm3 = u(i-1, j)
-  subps xmm2, xmm3   ; xmm2 = v(i, j+1) - v(i, j-1) + u(i+1, j) - u(i-1, j)
+  subps xmm2, xmm3   ; xmm2 = u(i+1, j) - u(i-1, j)
+  movups xmm3, [rdx] ; xmm3 = v(i, j+1)
+  addps xmm2, xmm3   ; xmm2 = u(i+1, j) - u(i-1, j) + v(i, j+1)
+  movups xmm3, [rax] ; xmm3 = v(i, j-1)
+  subps xmm2, xmm3   ; xmm2 = u(i+1, j) - u(i-1, j) + v(i, j+1) - v(i, j-1)
   mulps xmm2, xmm1   ; xmm2 = (-1/2N) * [v(i, j+1) - v(i, j-1) + u(i+1, j) - u(i-1, j)]
   movups [r8], xmm2
 
