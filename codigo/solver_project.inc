@@ -153,9 +153,9 @@ lea rax, [rax + r10 + 2*float_size] ; rax -> v(1, 1)
 mov rdx, [r13 + offset_u]
 lea rdx, [rdx + r10 + 2*float_size] ; rdx -> u(1, 1)
 lea rdi, [r14 + float_size] ;         rdi -> p(1, 0)
-lea rsi, [r14 + 2*r10 + float_size] ; rsi -> p(1, 2)
-lea r8, [r14 + float_size] ;          r8 -> p(0, 1)
-lea r9, [r14 + 2*r10 + float_size] ;  r9 -> p(2, 1)
+lea rsi, [rdi + 2*r10] ;              rsi -> p(1, 2)
+lea r8, [r14 + r10] ;                 r8 -> p(0, 1)
+lea r9, [r8 + 2*float_size] ;         r9 -> p(2, 1)
 
 xor r10, r10 ; r10 = 0 ; contador para comparar con r11
 
@@ -172,21 +172,21 @@ mulps xmm0, xmm1 ;                                      xmm0 = -N/2 | -N/2 | -N/
 ; el valor de xmm1 se puede descartar, xmm0 se va a usar en el ciclo2
 
 ; Valores antes del ciclo ("->" significa "puntero a")
-; rcx = (N^2)/4                        ; para el loop
-; rax -> v(1, 1)                       ; puntero a matriz para ciclo1
-; rdx -> u(1, 1)                       ; puntero a matriz para ciclo1
-; rdi -> p(1, 0)                       ; puntero a matriz para ciclo1
-; rsi -> p(1, 2)                       ; puntero a matriz para ciclo1
-; r8 -> p(0, 1)                        ; puntero a matriz para ciclo1
-; r9 -> p(2, 1)                        ; puntero a matriz para ciclo1
-; r10 = 0                              ; contador de 0 a N/4 para saltar en los bordes
-; r11 = N/4                            ; para comparar con r10
-; rbx = N                              ; no hace falta preservarlo pero se usa en la configuración inicial
-; r12                                  ; este registro no fue utilizado
-; r13 -> solver                        ; para preservarlo para llamar a solver_set_bnd
-; r14 -> p                             ; para preservarlo para llamar a solver_set_bnd
-; r15 -> div                           ; para preservarlo para llamar a solver_set_bnd
-; xmm0 = -N/2 | -N/2 | -N/2 | -N/2     ; para actualizar las matrices u y v
+; rcx = (N^2)/4                    ; para el loop
+; rax -> v(1, 1)                   ; puntero a matriz para ciclo1
+; rdx -> u(1, 1)                   ; puntero a matriz para ciclo1
+; rdi -> p(1, 0)                   ; puntero a matriz para ciclo1
+; rsi -> p(1, 2)                   ; puntero a matriz para ciclo1
+; r8 -> p(0, 1)                    ; puntero a matriz para ciclo1
+; r9 -> p(2, 1)                    ; puntero a matriz para ciclo1
+; r10 = 0                          ; contador de 0 a N/4 para saltar en los bordes
+; r11 = N/4                        ; para comparar con r10
+; rbx = N                          ; no hace falta preservarlo pero se usa en la configuración inicial
+; r12                              ; este registro no fue utilizado
+; r13 -> solver                    ; para preservarlo para llamar a solver_set_bnd
+; r14 -> p                         ; para preservarlo para llamar a solver_set_bnd
+; r15 -> div                       ; para preservarlo para llamar a solver_set_bnd
+; xmm0 = -N/2 | -N/2 | -N/2 | -N/2 ; para actualizar las matrices u y v
 
 .ciclo2:
   ; Actualización de matriz u:
