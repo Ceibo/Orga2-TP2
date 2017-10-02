@@ -6,8 +6,19 @@
 #include "solver.h"
 #include "rdtsc.h"
 
-char *archivoResultados  =  "resultados.txt";
-char *c;
+char* archivoResultados  =  "resultados.txt";
+uint32_t funcionATestear;
+uint32_t repeticiones = 100;
+uint32_t tamano = 512;
+
+//char *c;
+
+/*const uint32_t flush_cache_size = 2*1024*1024; // Allocate 2M. Set much larger then L2
+void flush_cache() {
+    for (uint32_t i = 0; i < 10; i++)
+    	for (uint32_t j = 0; j < flush_cache_size; j++)
+        	c[j] = i*j;
+}*/
 
 unsigned long solver_set_bnd_ticks_count(uint32_t size, uint32_t b) {
 	fluid_solver* solver = solver_create(size, 0.05, 0, 0);
@@ -23,42 +34,81 @@ unsigned long solver_set_bnd_ticks_count(uint32_t size, uint32_t b) {
 	return end - start;
 }
 
-const int flush_cache_size = 2*1024*1024; // Allocate 2M. Set much larger then L2
-void flush_cache() {
-    for (int i = 0; i < 0xffff; i++)
-    	for (int j = 0; j < flush_cache_size; j++)
-        	c[j] = i*j;
-}
-
-void run() {
+void test_solver_set_bnd() {
 	size_t i;
-	c = (char *)malloc(flush_cache_size);
-	for (i = 0; i < 100; ++i) {
+	unsigned long* ticks = malloc(sizeof(unsigned long) * tamano * 3);
+	//c = (char *)malloc(flush_cache_size);
+	for (i = 0; i < repeticiones; ++i) {
 		//flush_cache();
-		printf("%lu\n", solver_set_bnd_ticks_count(16, 1));
+		ticks[i] = solver_set_bnd_ticks_count(tamano, 1);
 	}
-	for (i = 0; i < 100; ++i) {
+	for (i = 0; i < repeticiones; ++i) {
 		//flush_cache();
-		printf("%lu\n", solver_set_bnd_ticks_count(16, 2));
+		ticks[i + tamano] = solver_set_bnd_ticks_count(tamano, 2);
 	}
-	for (i = 0; i < 100; ++i) {
+	for (i = 0; i < repeticiones; ++i) {
 		//flush_cache();
-		printf("%lu\n", solver_set_bnd_ticks_count(16, 3));
+		ticks[i + 2*tamano] = solver_set_bnd_ticks_count(tamano, 3);
 	}
-	free(c);
+	printf("%lu", ticks[0]);
+	for (i = 1; i < tamano*3; i++) {
+		printf(",%lu", ticks[i]);	
+	}
+	free(ticks);
+	//free(c);
 }
 
-int main (void) {
-	//run();
+void test_solver_project() {}
+void test_solver_lin_solve() {}
+
+void run_tests() {
+	switch (funcionATestear){
+		case 0:
+			test_solver_set_bnd();
+			break;
+		case 1:
+			test_solver_lin_solve();
+			break;
+		case 2:
+			test_solver_project();
+	}
+}
+
+int main (int argc, char ** argv) {
+	if (argc < 2) {
+		printf("Debe especificar la función a testear\n");
+		exit(EXIT_FAILURE);
+	} else if (strcmp(argv[1], "solver_lin_solve") == 0) {
+		funcionATestear = 1;
+	} else if (strcmp(argv[1], "solver_set_bnd") == 0) {
+		funcionATestear = 0;
+	} else if (strcmp(argv[1], "solver_project") == 0) {
+		funcionATestear = 2;
+	} else {
+		printf("Nombre de función desconocido, las opciones son: solver_lin_solve, solver_set_bnd, solver_project\n");
+		exit(EXIT_FAILURE);
+	}
+	if (argc > 2) {
+		archivoResultados = argv[2];
+	}
+	if (argc > 3) {
+		repeticiones = atoi(argv[3]);
+	}
+	if (argc > 4) {
+		tamano = atoi(argv[4]);
+	}
 	int save_out = dup(1);
 	remove(archivoResultados);
 	int pFile = open(archivoResultados, O_RDWR|O_CREAT|O_APPEND, 0600);
-	if (-1 == dup2(pFile, 1)) { perror("cannot redirect stdout"); return 255; }
-	run();
+	if (-1 == dup2(pFile, 1)) {
+		printf("cannot redirect stdout");
+		exit(EXIT_FAILURE);
+	}
+	run_tests();
 	fflush(stdout);
 	close(pFile);
 	dup2(save_out, 1);
-	return 0;    
+	exit(EXIT_SUCCESS);  
 }
 
 
