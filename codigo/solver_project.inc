@@ -13,36 +13,36 @@ push r15 ; pila alineada
 
 ; Datos que se preservan en los call
 
-mov r13, rdi ;                                r13 -> solver
-mov r14, rsi ;                                r14 -> p 
-mov r15, rdx ;                                r15 -> div
-mov ebx, [r13 + offset_N] ;                   rbx = N
+mov r13, rdi ;                     r13 -> solver
+mov r14, rsi ;                     r14 -> p 
+mov r15, rdx ;                     r15 -> div
+mov ebx, [r13 + offset_N] ;        rbx = N
 
 ; Configuración inicial para el ciclo 1
 
 mov r11d, ebx
-sar r11d, 2 ;                                 r11 = N/4
+sar r11d, 2 ;                      r11 = N/4
 
-mov rax, rbx
-mul eax
-mov ecx, eax ;                                rcx = N^2
-sar rcx, 2 ;                                  rcx = (N^2)/4
+mov rax, rbx ;                     rax = N
+mul eax ;                          rax = N^2
+mov ecx, eax ;                     rcx = N^2
+sar rcx, 2 ;                       rcx = (N^2)/4 ; para el loop, proceso de a 4 elementos
 
-mov r10, rbx ;                                r10 = N
-inc r10 ;                                     r10 = N+1
-inc r10 ;                                     r10 = N+2
-sal r10, 2 ;                                  r10 = (N+2)*4
+mov r10, rbx ;                     r10 = N
+inc r10 ;                          r10 = N+1
+inc r10 ;                          r10 = N+2
+sal r10, 2 ;                       r10 = (N+2)*4
 
 mov rax, [r13 + offset_v]
-add rax, float_size ;                         rax -> v(1, 0)
-lea rdx, [rax + 2*r10] ;                      rdx -> v(1, 2)
+add rax, float_size ;              rax -> v(1, 0)
+lea rdx, [rax + 2*r10] ;           rdx -> v(1, 2)
 mov rdi, [r13 + offset_u]
-add rdi, r10 ;                                rdi -> u(0, 1)
-lea rsi, [rdi + 2*float_size] ;               rsi -> u(2, 1)
-lea r8, [r15 + r10 + float_size] ;            r8 -> div(1, 1)
-lea r9, [r14 + r10 + float_size] ;            r9 -> p(1, 1)
+add rdi, r10 ;                     rdi -> u(0, 1)
+lea rsi, [rdi + 2*float_size] ;    rsi -> u(2, 1)
+lea r8, [r15 + r10 + float_size] ; r8 -> div(1, 1)
+lea r9, [r14 + r10 + float_size] ; r9 -> p(1, 1)
 
-xor r10, r10 ;                                r10 = 0
+xor r10, r10 ;                     r10 = 0
 
 pxor xmm0, xmm0 ; para blanquear la matriz p
 
@@ -53,9 +53,9 @@ movss xmm2, xmm1
 pslldq xmm2, float_size
 movss xmm2, xmm1
 pslldq xmm2, float_size
-movss xmm2, xmm1 ;                                      xmm2 = N | N | N | N
+movss xmm2, xmm1 ;                                                 xmm2 = N | N | N | N
 movups xmm1, [dquad_con_cuatro_float_de_valor_un_medio_negativo] ; xmm1 = -1/2 | -1/2 | -1/2 | -1/2
-divps xmm1, xmm2 ;                                      xmm1 = -1/2N | -1/2N | -1/2N | -1/2N
+divps xmm1, xmm2 ;                                                 xmm1 = -1/2N | -1/2N | -1/2N | -1/2N
 ; el valor de xmm2 se puede descartar, xmm1 se va a usar en el ciclo1
 
 ; Valores antes del ciclo ("->" significa "puntero a")
@@ -136,26 +136,26 @@ call solver_lin_solve
 ; Configuración inicial para el ciclo 2
 
 mov r11d, ebx
-sar r11d, 2 ;                                 r11 = N/4
+sar r11d, 2 ;                         r11 = N/4
 
 mov rax, rbx
 mul eax
-mov ecx, eax ;                                rcx = N^2
-sar ecx, 2 ;                                  rcx = (N^2)/4 ; proceso de a 4 elementos
+mov ecx, eax ;                        rcx = N^2
+sar ecx, 2 ;                          rcx = (N^2)/4 ; proceso de a 4 elementos
 
-mov r10, rbx ;                                r10 = N
-inc r10 ;                                     r10 = N+1
-inc r10 ;                                     r10 = N+2
-sal r10, 2 ;                                  r10 = (N+2)*4
+mov r10, rbx ;                        r10 = N
+inc r10 ;                             r10 = N+1
+inc r10 ;                             r10 = N+2
+sal r10, 2 ;                          r10 = (N+2)*4
 
 mov rax, [r13 + offset_v]
-lea rax, [rax + r10 + 2*float_size] ;         rax -> v(1, 1)
+lea rax, [rax + r10 + 2*float_size] ; rax -> v(1, 1)
 mov rdx, [r13 + offset_u]
-lea rdx, [rdx + r10 + 2*float_size] ;         rdx -> u(1, 1)
-lea rdi, [r14 + float_size] ;                 rdi -> p(1, 0)
-lea rsi, [r14 + 2*r10 + float_size] ;         rsi -> p(1, 2)
-lea r8, [r14 + float_size] ;                  r8 -> p(0, 1)
-lea r9, [r14 + 2*r10 + float_size] ;          r9 -> p(2, 1)
+lea rdx, [rdx + r10 + 2*float_size] ; rdx -> u(1, 1)
+lea rdi, [r14 + float_size] ;         rdi -> p(1, 0)
+lea rsi, [r14 + 2*r10 + float_size] ; rsi -> p(1, 2)
+lea r8, [r14 + float_size] ;          r8 -> p(0, 1)
+lea r9, [r14 + 2*r10 + float_size] ;  r9 -> p(2, 1)
 
 xor r10, r10 ;                                r10 = 0
 
