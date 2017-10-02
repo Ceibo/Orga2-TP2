@@ -36,7 +36,7 @@ unsigned long solver_set_bnd_ticks_count(uint32_t size, uint32_t b) {
 
 void test_solver_set_bnd() {
 	size_t i;
-	unsigned long* ticks = malloc(sizeof(unsigned long) * tamano * 3);
+	unsigned long* ticks = (unsigned long*) malloc(sizeof(unsigned long) * repeticiones * 3);
 	//c = (char *)malloc(flush_cache_size);
 	for (i = 0; i < repeticiones; ++i) {
 		//flush_cache();
@@ -44,14 +44,14 @@ void test_solver_set_bnd() {
 	}
 	for (i = 0; i < repeticiones; ++i) {
 		//flush_cache();
-		ticks[i + tamano] = solver_set_bnd_ticks_count(tamano, 2);
+		ticks[i + repeticiones] = solver_set_bnd_ticks_count(tamano, 2);
 	}
 	for (i = 0; i < repeticiones; ++i) {
 		//flush_cache();
-		ticks[i + 2*tamano] = solver_set_bnd_ticks_count(tamano, 3);
+		ticks[i + 2*repeticiones] = solver_set_bnd_ticks_count(tamano, 3);
 	}
 	printf("%lu", ticks[0]);
-	for (i = 1; i < tamano*3; i++) {
+	for (i = 1; i < repeticiones*3; i++) {
 		printf(",%lu", ticks[i]);	
 	}
 	free(ticks);
