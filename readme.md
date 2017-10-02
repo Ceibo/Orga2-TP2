@@ -2,9 +2,9 @@ Medidor de ticks:
 
 Compilar: make resultados
 
-Generar archivo de mediciones: ./resultados <función> [<nombre del archivo de salida>] [<cantidad de mediciones>] [<tamaño de la matriz>]
+Generar archivo de mediciones: ./resultados función nombre_del_archivo_de_salida cantidad_de_mediciones tamaño_de_la_matriz
 
-<función>: es obligatorio. Opciones: solver_set_bnd, solver_lin_solve, solver_project
+función: es obligatorio. Opciones: solver_set_bnd, solver_lin_solve, solver_project
 
 El resto de parámetros son optativos.
 
