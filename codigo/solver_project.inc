@@ -129,8 +129,8 @@ mov rdi, r13                           ; rdi -> solver
 xor rsi, rsi                           ; rsi = 0
 mov rdx, r14                           ; rdx -> p
 mov rcx, r15                           ; rcx -> div
-movss xmm0, [dword_float_valor_uno]    ; r8 = 1.0f
-movss xmm1, [dword_float_valor_cuatro] ; r9 = 4.0f
+movss xmm0, [dword_float_valor_uno]    ; xmm0 = 1.0f
+movss xmm1, [dword_float_valor_cuatro] ; xmm1 = 4.0f
 call solver_lin_solve
 
 ; Configuración inicial para el ciclo 2
