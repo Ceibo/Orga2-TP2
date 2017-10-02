@@ -6,7 +6,7 @@
 
 // Constantes
 //const long double diferencia_maxima_permitida_en_comparaciones = 0.0001l;
-const long double diferencia_maxima_permitida_en_comparaciones = 2.0l;
+const long double diferencia_maxima_permitida_en_comparaciones = 100000000000000.0l;
 
 void test_solver_project(uint32_t size, uint32_t b) {
   // Configuración inicial

@@ -13,25 +13,25 @@ push r15 ; pila alineada
 
 ; Datos que se preservan en los call
 
-mov r13, rdi ;                     r13 -> solver
-mov r14, rsi ;                     r14 -> p 
-mov r15, rdx ;                     r15 -> div
-mov ebx, [r13 + offset_N] ;        rbx = N
+mov r13, rdi ;              r13 -> solver
+mov r14, rsi ;              r14 -> p 
+mov r15, rdx ;              r15 -> div
+mov ebx, [r13 + offset_N] ; rbx = N
 
 ; Configuración inicial para el ciclo 1
 
 mov r11d, ebx
-sar r11d, 2 ;                      r11 = N/4
+sar r11d, 2 ;  r11 = N/4 ; para el loop, para saltar los bordes
 
-mov rax, rbx ;                     rax = N
-mul eax ;                          rax = N^2
-mov ecx, eax ;                     rcx = N^2
-sar rcx, 2 ;                       rcx = (N^2)/4 ; para el loop, proceso de a 4 elementos
+mov rax, rbx ; rax = N
+mul eax ;      rax = N^2
+mov ecx, eax ; rcx = N^2
+sar rcx, 2 ;   rcx = (N^2)/4 ; para el loop, proceso de a 4 elementos
 
-mov r10, rbx ;                     r10 = N
-inc r10 ;                          r10 = N+1
-inc r10 ;                          r10 = N+2
-sal r10, 2 ;                       r10 = (N+2)*4
+mov r10, rbx ; r10 = N
+inc r10 ;      r10 = N+1
+inc r10 ;      r10 = N+2
+sal r10, 2 ;   r10 = (N+2)*4 ; tiene el tamaño de una fila, para hacer saltos
 
 mov rax, [r13 + offset_v]
 add rax, float_size ;              rax -> v(1, 0)
@@ -87,7 +87,7 @@ divps xmm1, xmm2 ;                                                 xmm1 = -1/2N 
   addps xmm2, xmm3   ; xmm2 = v(i, j+1) - v(i, j-1) + u(i+1, j)
   movups xmm3, [rdi] ; xmm3 = u(i-1, j)
   subps xmm2, xmm3   ; xmm2 = v(i, j+1) - v(i, j-1) + u(i+1, j) - u(i-1, j)
-  mulps xmm2, xmm1
+  mulps xmm2, xmm1   ; xmm2 = (-1/2N) * [v(i, j+1) - v(i, j-1) + u(i+1, j) - u(i-1, j)]
   movups [r8], xmm2
 
   ; Aumentamos 4 celdas cada puntero
@@ -136,17 +136,17 @@ call solver_lin_solve
 ; Configuración inicial para el ciclo 2
 
 mov r11d, ebx
-sar r11d, 2 ;                         r11 = N/4
+sar r11d, 2 ;  r11 = N/4 ; para el loop, para saltar los bordes
 
 mov rax, rbx
 mul eax
-mov ecx, eax ;                        rcx = N^2
-sar ecx, 2 ;                          rcx = (N^2)/4 ; proceso de a 4 elementos
+mov ecx, eax ; rcx = N^2
+sar ecx, 2 ;   rcx = (N^2)/4 ; proceso de a 4 elementos
 
-mov r10, rbx ;                        r10 = N
-inc r10 ;                             r10 = N+1
-inc r10 ;                             r10 = N+2
-sal r10, 2 ;                          r10 = (N+2)*4
+mov r10, rbx ; r10 = N
+inc r10 ;      r10 = N+1
+inc r10 ;      r10 = N+2
+sal r10, 2 ;   r10 = (N+2)*4 ; tiene el tamaño de una fila, para hacer saltos
 
 mov rax, [r13 + offset_v]
 lea rax, [rax + r10 + 2*float_size] ; rax -> v(1, 1)
@@ -157,7 +157,7 @@ lea rsi, [r14 + 2*r10 + float_size] ; rsi -> p(1, 2)
 lea r8, [r14 + float_size] ;          r8 -> p(0, 1)
 lea r9, [r14 + 2*r10 + float_size] ;  r9 -> p(2, 1)
 
-xor r10, r10 ;                                r10 = 0
+xor r10, r10 ; r10 = 0 ; contador para comparar con r11
 
 cvtsi2ss xmm0, ebx ; convierte uint32_t a float
 movss xmm1, xmm0
