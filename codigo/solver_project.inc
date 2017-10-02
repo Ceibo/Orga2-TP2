@@ -166,9 +166,9 @@ movss xmm1, xmm0
 pslldq xmm1, float_size
 movss xmm1, xmm0
 pslldq xmm1, float_size
-movss xmm1, xmm0 ;                                      xmm1 = N | N | N | N
+movss xmm1, xmm0 ;                                                 xmm1 = N | N | N | N
 movups xmm0, [dquad_con_cuatro_float_de_valor_un_medio_negativo] ; xmm0 = -1/2 | -1/2 | -1/2 | -1/2
-mulps xmm0, xmm1 ;                                      xmm0 = -N/2 | -N/2 | -N/2 | -N/2
+mulps xmm0, xmm1 ;                                                 xmm0 = -N/2 | -N/2 | -N/2 | -N/2
 ; el valor de xmm1 se puede descartar, xmm0 se va a usar en el ciclo2
 
 ; Valores antes del ciclo ("->" significa "puntero a")
@@ -195,17 +195,17 @@ mulps xmm0, xmm1 ;                                      xmm0 = -N/2 | -N/2 | -N/
   subps xmm1, xmm2   ; xmm1 = p(i+1, j) - p(i-1, j)
   mulps xmm1, xmm0   ; xmm1 = -N/2*[p(i+1, j) - p(i-1, j)]
   movups xmm2, [rdx] ; xmm2 = u(i, j)
-  addps xmm1, xmm2   ; xmm1 = u(i, j) -N/2*[p(i+1, j) - p(i-1, j)]
-  movups [rdx], xmm1
+  addps xmm1, xmm2   ; xmm1 = u(i, j) - N/2*[p(i+1, j) - p(i-1, j)]
+  movups [rdx], xmm1 ; u(i, j) -= N/2*[p(i+1, j) - p(i-1, j)]
 
   ; Actualización de matriz v:
-  movups xmm1, [rsi]
-  movups xmm2, [rdi]
-  subps xmm1, xmm2
-  mulps xmm1, xmm0
-  movups xmm2, [rax]
-  addps xmm1, xmm2
-  movups [rax], xmm1
+  movups xmm1, [rsi] ; xmm1 = p(i, j+1)
+  movups xmm2, [rdi] ; xmm2 = p(i, j-1)
+  subps xmm1, xmm2   ; xmm1 = p(i, j+1) - p(i, j-1)
+  mulps xmm1, xmm0   ; xmm1 = -N/2*[p(i, j+1) - p(i, j-1)]
+  movups xmm2, [rax] ; xmm2 = v(i, j)
+  addps xmm1, xmm2   ; xmm1 = v(i, j) - N/2*[p(i, j+1) - p(i, j-1)]
+  movups [rax], xmm1 ; v(i, j) -= N/2*[p(i, j+1) - p(i, j-1)]
 
   ; Aumentamos 4 celdas cada puntero
   add rax, xmm_size
