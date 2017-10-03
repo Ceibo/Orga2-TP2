@@ -2,7 +2,7 @@
 #include "assert.h"
 
 // Constantes
-const long double diferencia_maxima_permitida_en_comparaciones = 0.0001l;
+const long double diferencia_maxima_permitida_en_comparaciones = 0.00003l;
 
 void test_solver_lin_solve(uint32_t size, uint32_t b, float a, float c) {
   // Configuración inicial
@@ -26,12 +26,23 @@ void test_solver_lin_solve(uint32_t size, uint32_t b, float a, float c) {
   // Pruebas
   solver_lin_solve_c(solver, b, solver->u, solver->v, a, c);
   solver_lin_solve(solver, b, u, v, a, c);
+
+  float max_dif = 0;
+  float aux;
+
   for (i = 0; i < size; ++i) {
     for (j = 0; j < size; ++j) {
-      assert(fabs(u[IX(i, j)] - solver->u[IX(i, j)]) < diferencia_maxima_permitida_en_comparaciones);
-      assert(fabs(v[IX(i, j)] - solver->v[IX(i, j)]) < diferencia_maxima_permitida_en_comparaciones);
+      aux = fabs(u[IX(i, j)] - solver->u[IX(i, j)]);
+      if (aux > max_dif) max_dif = aux;
+      assert(aux <= diferencia_maxima_permitida_en_comparaciones);
+
+      aux = fabs(v[IX(i, j)] - solver->v[IX(i, j)]);
+      if (aux > max_dif) max_dif = aux;
+      assert(aux <= diferencia_maxima_permitida_en_comparaciones);
     }
   }
+
+  printf("Tamaño de la matriz: %i. La diferencia máxima es: %f\n", size-2, max_dif);
 
   // Limpieza
   solver_destroy(solver);
@@ -40,6 +51,8 @@ void test_solver_lin_solve(uint32_t size, uint32_t b, float a, float c) {
 }
 
 int main() {
+  printf("Máximo error permitido: %Lf\n", diferencia_maxima_permitida_en_comparaciones);
+
   test_solver_lin_solve(4, 0, 0.3f, 2.8f);
   test_solver_lin_solve(4, 1, 0.3f, 2.8f);
   test_solver_lin_solve(4, 2, 0.3f, 2.8f);
@@ -83,5 +96,7 @@ int main() {
   test_solver_lin_solve(512, 0, 1.0f, 4.0f);
   test_solver_lin_solve(512, 1, 1.0f, 4.0f);
   test_solver_lin_solve(512, 2, 1.0f, 4.0f);
+
+  printf("TEST APROBADO\n");
   return 0;
 }
