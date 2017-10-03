@@ -10,7 +10,7 @@ const long double diferencia_maxima_permitida_en_comparaciones = 3.5l;
 
 void test_solver_project(uint32_t size, uint32_t b) {
   // Configuración inicial
-  fluid_solver* solver_c = solver_create(size, 0.05f, 0.0f, 0.0f);
+  fluid_solver* solver_c = solver_create(size, 0.05, 0, 0);
   solver_set_initial_velocity(solver_c);
   solver_set_bnd(solver_c, b, solver_c->u);
   solver_set_bnd(solver_c, b, solver_c->v);
@@ -18,7 +18,7 @@ void test_solver_project(uint32_t size, uint32_t b) {
   float* div_c = (float*) malloc(sizeof(float) * (size+2) * (size+2));
   float* p_c = (float*) malloc(sizeof(float) * (size+2) * (size+2));
 
-  fluid_solver* solver_asm = solver_create(size, 0.05f, 0.0f, 0.0f);
+  fluid_solver* solver_asm = solver_create(size, 0.05, 0, 0);
   solver_set_initial_velocity(solver_asm);
   solver_set_bnd(solver_asm, b, solver_asm->u);
   solver_set_bnd(solver_asm, b, solver_asm->v);
