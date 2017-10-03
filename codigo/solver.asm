@@ -12,13 +12,14 @@
 
 ; constantes para SIMD
 %define float_size 4
+%define double_float_size 8
 %define xmm_size 16
 
 section .rodata
 
 dquad_con_bits_de_signo_float_en_1_y_el_resto_en_0: DD 0x80000000, 0x80000000, 0x80000000, 0x80000000
-dquad_con_cuatro_float_de_valor_un_medio_negativo: DD -0.5, -0.5, -0.5, -0.5
-dquad_con_cuatro_float_de_valor_un_medio: DD 0.5, 0.5, 0.5, 0.5
+dquad_con_dos_double_de_valor_un_medio_negativo: DQ -0.5, -0.5
+dquad_con_dos_double_de_valor_un_medio: DQ 0.5, 0.5
 dword_float_valor_uno: DD 1.0
 dword_float_valor_cuatro: DD 4.0
 
