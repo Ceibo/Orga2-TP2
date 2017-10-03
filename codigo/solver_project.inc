@@ -54,41 +54,40 @@ movss xmm2, xmm1
 pslldq xmm2, float_size
 movss xmm2, xmm1 ;                                                 xmm2 = N | N | N | N
 movups xmm1, [dquad_con_cuatro_float_de_valor_un_medio_negativo] ; xmm1 = -1/2 | -1/2 | -1/2 | -1/2
+divps xmm1, xmm2 ;                                                 xmm1 = -1/2N | -1/2N | -1/2N | -1/2N
+; el valor de xmm2 se puede descartar, xmm1 se va a usar en el ciclo1
 
 ; Valores antes del ciclo ("->" significa "puntero a")
-; rcx = (N^2)/4                    ; para el loop
-; rax -> v(1, 0)                   ; puntero a matriz para ciclo1
-; rdx -> v(1, 2)                   ; puntero a matriz para ciclo1
-; rdi -> u(0, 1)                   ; puntero a matriz para ciclo1
-; rsi -> u(2, 1)                   ; puntero a matriz para ciclo1
-; r8 -> div(1, 1)                  ; puntero a matriz para ciclo1
-; r9 -> p(1, 1)                    ; puntero a matriz para ciclo1
-; r10 = 0                          ; contador de 0 a N/4 para saltar en los bordes
-; r11 = N/4                        ; para comparar con r10
-; rbx = N                          ; no hace falta preservarlo pero se usa en la configuración inicial
-; r12                              ; este registro no fue utilizado
-; r13 -> solver                    ; para preservarlo para llamar a solver_set_bnd
-; r14 -> p                         ; para preservarlo para llamar a solver_set_bnd
-; r15 -> div                       ; para preservarlo para llamar a solver_set_bnd
-; xmm0 = 0 | 0 | 0 | 0             ; para blanquear la matriz p
-; xmm1 = -1/2 | -1/2 | -1/2 | -1/2 ; para actualizar la matriz div
-; xmm2 = N | N | N | N             ; para actualizar la matriz div
-
+; rcx = (N^2)/4                        ; para el loop
+; rax -> v(1, 0)                       ; puntero a matriz para ciclo1
+; rdx -> v(1, 2)                       ; puntero a matriz para ciclo1
+; rdi -> u(0, 1)                       ; puntero a matriz para ciclo1
+; rsi -> u(2, 1)                       ; puntero a matriz para ciclo1
+; r8 -> div(1, 1)                      ; puntero a matriz para ciclo1
+; r9 -> p(1, 1)                        ; puntero a matriz para ciclo1
+; r10 = 0                              ; contador de 0 a N/4 para saltar en los bordes
+; r11 = N/4                            ; para comparar con r10
+; rbx = N                              ; no hace falta preservarlo pero se usa en la configuración inicial
+; r12                                  ; este registro no fue utilizado
+; r13 -> solver                        ; para preservarlo para llamar a solver_set_bnd
+; r14 -> p                             ; para preservarlo para llamar a solver_set_bnd
+; r15 -> div                           ; para preservarlo para llamar a solver_set_bnd
+; xmm0 = 0 | 0 | 0 | 0                 ; para blanquear la matriz p
+; xmm1 = -1/2N | -1/2N | -1/2N | -1/2N ; para actualizar la matriz div
 .ciclo1:
   ; Blanqueo de matriz p:
   movdqu [r9], xmm0
 
   ; Actualización de matriz div:
-  movups xmm3, [rsi] ; xmm3 = u(i+1, j)
-  movups xmm4, [rdi] ; xmm4 = u(i-1, j)
-  subps xmm3, xmm4   ; xmm3 = u(i+1, j) - u(i-1, j)
-  movups xmm4, [rdx] ; xmm4 = v(i, j+1)
-  addps xmm3, xmm4   ; xmm3 = u(i+1, j) - u(i-1, j) + v(i, j+1)
-  movups xmm4, [rax] ; xmm4 = v(i, j-1)
-  subps xmm3, xmm4   ; xmm3 = u(i+1, j) - u(i-1, j) + v(i, j+1) - v(i, j-1)
-  mulps xmm3, xmm1   ; xmm2 = (-1/2) * [v(i, j+1) - v(i, j-1) + u(i+1, j) - u(i-1, j)]
-  divps xmm3, xmm2   ; xmm2 = (-1/2) * [v(i, j+1) - v(i, j-1) + u(i+1, j) - u(i-1, j)] / N
-  movups [r8], xmm3
+  movups xmm2, [rsi] ; xmm2 = u(i+1, j)
+  movups xmm3, [rdi] ; xmm3 = u(i-1, j)
+  subps xmm2, xmm3   ; xmm2 = u(i+1, j) - u(i-1, j)
+  movups xmm3, [rdx] ; xmm3 = v(i, j+1)
+  addps xmm2, xmm3   ; xmm2 = u(i+1, j) - u(i-1, j) + v(i, j+1)
+  movups xmm3, [rax] ; xmm3 = v(i, j-1)
+  subps xmm2, xmm3   ; xmm2 = u(i+1, j) - u(i-1, j) + v(i, j+1) - v(i, j-1)
+  mulps xmm2, xmm1   ; xmm2 = (-1/2N) * [v(i, j+1) - v(i, j-1) + u(i+1, j) - u(i-1, j)]
+  movups [r8], xmm2
 
   ; Aumentamos 4 celdas cada puntero
   add rax, xmm_size
@@ -167,46 +166,46 @@ movss xmm1, xmm0
 pslldq xmm1, float_size
 movss xmm1, xmm0
 pslldq xmm1, float_size
-movss xmm1, xmm0 ;                                        xmm1 = N | N | N | N
-movups xmm0, [dquad_con_cuatro_float_de_valor_un_medio] ; xmm0 = 1/2 | 1/2 | 1/2 | 1/2
-mulps xmm0, xmm1 ;                                        xmm0 = N/2 | N/2 | N/2 | N/2
+movss xmm1, xmm0 ;                                                 xmm1 = N | N | N | N
+movups xmm0, [dquad_con_cuatro_float_de_valor_un_medio_negativo] ; xmm0 = -1/2 | -1/2 | -1/2 | -1/2
+mulps xmm0, xmm1 ;                                                 xmm0 = -N/2 | -N/2 | -N/2 | -N/2
 ; el valor de xmm1 se puede descartar, xmm0 se va a usar en el ciclo2
 
 ; Valores antes del ciclo ("->" significa "puntero a")
-; rcx = (N^2)/4                ; para el loop
-; rax -> v(1, 1)               ; puntero a matriz para ciclo1
-; rdx -> u(1, 1)               ; puntero a matriz para ciclo1
-; rdi -> p(1, 0)               ; puntero a matriz para ciclo1
-; rsi -> p(1, 2)               ; puntero a matriz para ciclo1
-; r8 -> p(0, 1)                ; puntero a matriz para ciclo1
-; r9 -> p(2, 1)                ; puntero a matriz para ciclo1
-; r10 = 0                      ; contador de 0 a N/4 para saltar en los bordes
-; r11 = N/4                    ; para comparar con r10
-; rbx = N                      ; no hace falta preservarlo pero se usa en la configuración inicial
-; r12                          ; este registro no fue utilizado
-; r13 -> solver                ; para preservarlo para llamar a solver_set_bnd
-; r14 -> p                     ; para preservarlo para llamar a solver_set_bnd
-; r15 -> div                   ; para preservarlo para llamar a solver_set_bnd
-; xmm0 = N/2 | N/2 | N/2 | N/2 ; para actualizar las matrices u y v
+; rcx = (N^2)/4                    ; para el loop
+; rax -> v(1, 1)                   ; puntero a matriz para ciclo1
+; rdx -> u(1, 1)                   ; puntero a matriz para ciclo1
+; rdi -> p(1, 0)                   ; puntero a matriz para ciclo1
+; rsi -> p(1, 2)                   ; puntero a matriz para ciclo1
+; r8 -> p(0, 1)                    ; puntero a matriz para ciclo1
+; r9 -> p(2, 1)                    ; puntero a matriz para ciclo1
+; r10 = 0                          ; contador de 0 a N/4 para saltar en los bordes
+; r11 = N/4                        ; para comparar con r10
+; rbx = N                          ; no hace falta preservarlo pero se usa en la configuración inicial
+; r12                              ; este registro no fue utilizado
+; r13 -> solver                    ; para preservarlo para llamar a solver_set_bnd
+; r14 -> p                         ; para preservarlo para llamar a solver_set_bnd
+; r15 -> div                       ; para preservarlo para llamar a solver_set_bnd
+; xmm0 = -N/2 | -N/2 | -N/2 | -N/2 ; para actualizar las matrices u y v
 
 .ciclo2:
   ; Actualización de matriz u:
   movups xmm1, [r9]  ; xmm1 = p(i+1, j)
   movups xmm2, [r8]  ; xmm2 = p(i-1, j)
   subps xmm1, xmm2   ; xmm1 = p(i+1, j) - p(i-1, j)
-  mulps xmm1, xmm0   ; xmm1 = N/2*[p(i+1, j) - p(i-1, j)]
+  mulps xmm1, xmm0   ; xmm1 = -N/2*[p(i+1, j) - p(i-1, j)]
   movups xmm2, [rdx] ; xmm2 = u(i, j)
-  subps xmm2, xmm1   ; xmm2 = u(i, j) - N/2*[p(i+1, j) - p(i-1, j)]
-  movups [rdx], xmm2 ; u(i, j) -= N/2*[p(i+1, j) - p(i-1, j)]
+  addps xmm1, xmm2   ; xmm1 = u(i, j) - N/2*[p(i+1, j) - p(i-1, j)]
+  movups [rdx], xmm1 ; u(i, j) -= N/2*[p(i+1, j) - p(i-1, j)]
 
   ; Actualización de matriz v:
   movups xmm1, [rsi] ; xmm1 = p(i, j+1)
   movups xmm2, [rdi] ; xmm2 = p(i, j-1)
   subps xmm1, xmm2   ; xmm1 = p(i, j+1) - p(i, j-1)
-  mulps xmm1, xmm0   ; xmm1 = N/2*[p(i, j+1) - p(i, j-1)]
+  mulps xmm1, xmm0   ; xmm1 = -N/2*[p(i, j+1) - p(i, j-1)]
   movups xmm2, [rax] ; xmm2 = v(i, j)
-  subps xmm2, xmm1   ; xmm1 = v(i, j) - N/2*[p(i, j+1) - p(i, j-1)]
-  movups [rax], xmm2 ; v(i, j) -= N/2*[p(i, j+1) - p(i, j-1)]
+  addps xmm1, xmm2   ; xmm1 = v(i, j) - N/2*[p(i, j+1) - p(i, j-1)]
+  movups [rax], xmm1 ; v(i, j) -= N/2*[p(i, j+1) - p(i, j-1)]
 
   ; Aumentamos 4 celdas cada puntero
   add rax, xmm_size
