@@ -24,9 +24,8 @@ mov r11d, ebx
 sar r11d, 2 ;  r11 = N/4 ; para el loop, para saltar los bordes
 
 mov rax, rbx ; rax = N
-mul eax ;      rax = N^2
-mov ecx, eax ; rcx = N^2
-sar rcx, 2 ;   rcx = (N^2)/4 ; para el loop, proceso de a 4 elementos
+mul r11d ;     rax = N*(N/4) = (N^2)/4
+mov ecx, eax ; rcx = (N^2)/4 ; para el loop, proceso de a 4 elementos
 
 mov r10, rbx ; r10 = N
 inc r10 ;      r10 = N+1
@@ -138,10 +137,9 @@ call solver_lin_solve
 mov r11d, ebx
 sar r11d, 2 ;  r11 = N/4 ; para el loop, para saltar los bordes
 
-mov rax, rbx
-mul eax
-mov ecx, eax ; rcx = N^2
-sar ecx, 2 ;   rcx = (N^2)/4 ; proceso de a 4 elementos
+mov rax, rbx ; rax = N
+mul r11d ;     rax = N*(N/4) = (N^2)/4
+mov ecx, eax ; rcx = (N^2)/4 ; proceso de a 4 elementos
 
 mov r10, rbx ; r10 = N
 inc r10 ;      r10 = N+1
