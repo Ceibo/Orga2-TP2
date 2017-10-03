@@ -5,8 +5,7 @@
 #define IXX(i,j) ((i)+(size+2)*(j))
 
 // Constantes
-//const long double diferencia_maxima_permitida_en_comparaciones = 0.0001l;
-const long double diferencia_maxima_permitida_en_comparaciones = 3.5l;
+const long double diferencia_maxima_permitida_en_comparaciones = 0;
 
 void test_solver_project(uint32_t size, uint32_t b) {
   // Configuración inicial

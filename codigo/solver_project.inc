@@ -147,14 +147,16 @@ inc r10 ;      r10 = N+1
 inc r10 ;      r10 = N+2
 sal r10, 2 ;   r10 = (N+2)*4 ; tiene el tamaño de una fila, para hacer saltos
 
-mov rax, [r13 + offset_v]
-lea rax, [rax + r10 + 2*float_size] ; rax -> v(1, 1)
-mov rdx, [r13 + offset_u]
-lea rdx, [rdx + r10 + 2*float_size] ; rdx -> u(1, 1)
-lea rdi, [r14 + float_size] ;         rdi -> p(1, 0)
-lea rsi, [rdi + 2*r10] ;              rsi -> p(1, 2)
-lea r8, [r14 + r10] ;                 r8 -> p(0, 1)
-lea r9, [r8 + 2*float_size] ;         r9 -> p(2, 1)
+mov rdi, [r13 + offset_v] ;         rdi -> v(0, 0)
+lea rax, [rdi + r10 + float_size] ; rax -> v(1, 1)
+
+mov rdi, [r13 + offset_u] ;         rdi -> u(0, 0)
+lea rdx, [rdi + r10 + float_size] ; rdx -> u(1, 1)
+
+lea rdi, [r14 + float_size] ;       rdi -> p(1, 0)
+lea rsi, [rdi + 2*r10] ;            rsi -> p(1, 2)
+lea r8, [r14 + r10] ;               r8 -> p(0, 1)
+lea r9, [r8 + 2*float_size] ;       r9 -> p(2, 1)
 
 xor r10, r10 ; r10 = 0 ; contador para comparar con r11
 
