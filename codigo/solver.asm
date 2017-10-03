@@ -18,6 +18,7 @@ section .data
 
 dquad_con_bits_de_signo_float_en_1_y_el_resto_en_0: DD 0x80000000, 0x80000000, 0x80000000, 0x80000000
 dquad_con_cuatro_float_de_valor_un_medio_negativo: DD -0.5, -0.5, -0.5, -0.5
+dquad_con_cuatro_float_de_valor_un_medio: DD 0.5, 0.5, 0.5, 0.5
 dword_float_valor_uno: DD 1.0
 dword_float_valor_cuatro: DD 4.0
 
