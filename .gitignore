@@ -6,6 +6,7 @@ test_solver_set_bnd
 test_solver_lin_solve
 test_solver_project
 *.pdf
+!/informe/informe-tp2-ariane5.pdf
 *.aux
 *.log
 matrix_*.bmp

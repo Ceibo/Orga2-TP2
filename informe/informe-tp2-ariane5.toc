@@ -5,4 +5,5 @@
 \contentsline {subsection}{\numberline {2.2}Funci\IeC {\'o}n solver\_set\_bnd}{4}
 \contentsline {subsection}{\numberline {2.3}Funci\IeC {\'o}n solver\_project}{5}
 \contentsline {section}{\numberline {3}Resultados}{5}
-\contentsline {section}{\numberline {4}Conclusi\IeC {\'o}n}{5}
+\contentsline {subsection}{\numberline {3.1}Eficiencia c vs paralelismo simd asm}{5}
+\contentsline {section}{\numberline {4}Conclusi\IeC {\'o}n}{6}
