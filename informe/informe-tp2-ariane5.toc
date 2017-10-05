@@ -4,9 +4,9 @@
 \contentsline {subsection}{\numberline {2.1}Funci\IeC {\'o}n solver\_lin\_solve}{2}
 \contentsline {subsection}{\numberline {2.2}Funci\IeC {\'o}n solver\_set\_bnd}{4}
 \contentsline {subsection}{\numberline {2.3}Funci\IeC {\'o}n solver\_project}{5}
-\contentsline {subsection}{\numberline {2.4}Eficiencia c vs paralelismo simd asm}{6}
+\contentsline {subsection}{\numberline {2.4}Eficiencia c vs paralelismo SIMD asm}{6}
 \contentsline {section}{\numberline {3}Resultados}{6}
 \contentsline {subsection}{\numberline {3.1}Funci\IeC {\'o}n solver set bnd}{6}
 \contentsline {subsection}{\numberline {3.2}Funci\IeC {\'o}n solver lin solve}{7}
-\contentsline {subsection}{\numberline {3.3}Funci\IeC {\'o}n solver project}{8}
+\contentsline {subsection}{\numberline {3.3}Funci\IeC {\'o}n solver project}{7}
 \contentsline {section}{\numberline {4}Conclusi\IeC {\'o}n}{9}

@@ -80,17 +80,19 @@ $N\times N$ de $x$ actualizado.\newline
 \par Los calculos que hacemos dentro de la función, trabajan sobre la matriz $div$, con las matrices $u$ y $v$ de solver. Para cada celda de la matriz $div$, vamos a operar con las celdas aledañas (por arriba y por abajo, no las que están en diagonal) a la de la misma posicion de las matrices $u$ y $v$ (tengamos en cuenta que todas estas son matrices de igual dimensión).
 Notemos que solo podemos realizar estas operaciónes en las celdas de la matriz que no se encuentran en los bordes de la misma.
 Entonces, vamos a querer hacer estas operaciones con instruciones SIMD.
+
 El mayor problema acá se presentó cuando quisimos hacer las operaciones que tomaban las celdas de distintas filas de la matriz.
-Esto lo resolvimos teniendo 4 punteros, uno a cada celda "aledaña" con la que ibamos a operar, empezando por el primer elemento de nuestra submatriz. Es decir, para el (1,1) tenemos un puntero al (0,1), otro al (2,1), otro al (1,0) y otro al (1,2).
+Esto lo resolvimos teniendo 4 punteros, uno a cada celda \textit{aledaña} con la que ibamos a operar, empezando por el primer elemento de nuestra submatriz. Es decir, para el (1,1) tenemos un puntero al (0,1), otro al (2,1), otro al (1,0) y otro al (1,2).
 Con esto podemos usar SIMD tomando de a 4 elementos, tanto en la matriz que vamos a modificar com en las otras con las que vamos a operar, donde ahora tenemos punteros a los elementos que nos interesan.
 \newline
 
-\par Ahora, cuando tomamos la matriz div (la "principal", o sobre la cual estamos operando), con una instrucción SIMD avanzamos de a 4 celdas. Como la submatriz en la que nos movemos tiene el tamaño de sus filas multiplo de 4 (dato del enunciado), no tenemos que preocuparnos por tomar algún elemento no deseado cuando la función termine de recorrer una fila.
+\par Cuando tomamos la matriz $div$ (la "principal", o sobre la cual estamos operando), con una instrucción SIMD avanzamos de a 4 celdas. Como la submatriz en la que nos movemos tiene el tamaño de sus filas multiplo de 4 (dato del enunciado), no tenemos que preocuparnos por tomar algún elemento no deseado cuando la función termine de recorrer una fila.
+
 Con lo que sí tenemos que tener cuidado es con cómo pasar de una fila a otra, por que en la estructura, entre una fila y otra de la submatriz en la que trabajamos tenemos 2 elementos.
 Para resolver esto, chequeamos con el tamaño de cada fila (dato) si la terminamos de recorrer.
-En caso de no haber terminado, seguimos operando sobre la misma fila, y en caso de haber terminado de recorrerla, lo que hacemos es sumar dos posiciónes extras para la próxima iteración, salteandonos así los bordes de la matriz, que no queremos modificar ahora.
 
-%SACAR ESTE PARRAFO
+En caso de no haber terminado, seguimos operando sobre la misma fila, y en caso de haber terminado de recorrerla, lo que hacemos es sumar dos posiciónes extras para la próxima iteración, salteandonos así los bordes de la matriz, que no queremos modificar ahora.\newline
+
 \par Ahora lo único que nos restaba hacer en cada ciclo era dejar en cero todas las celdas de la misma submatriz pero de $p$ (o sea, la matriz $p$ sin sus bordes). 
 En nuestra implementación lo hicimos al principio del ciclo (aun que podríamos haberlo hecho en otro momento dentro del ciclo, al no  utilizar la matriz $p$ para nada más a lo largo de ese primer ciclo).
 Esta matriz la recorremos en conjunto con las demás, al ser exactamente del mismo tamaño de las demás.
@@ -102,8 +104,8 @@ Luego, llamamos a solver\_lin\_solve.\newline
 
 \par Como podemos observar, estas llamadas a otras funciones modifican los parametros con los que trabajamos.
 Ahora en el segundo ciclo, trabajamos sobre las matrices $u$ y $v$ de solver (ambas de tamaño (N+$1$) x (N+$1$) ), y al igual que en el ciclo anterior lo que hacemos es recorrer la submatriz de N x N formada por la matriz sin sus bordes.
-En este caso lo único que cambia respecto del ciclo anterior es que son otras operaciones las que hay que hacer pero no son muy distintas, dado que volvemos a usar esas celdas "aledañas".
-Luego vamos a recorrer las mat\dfrac{•}{•}rices de manera análoga a como hicimos en el primer ciclo.
+En este caso lo único que cambia respecto del ciclo anterior es que son otras operaciones las que hay que hacer pero no son muy distintas, dado que volvemos a usar esas celdas aledañas.
+Luego vamos a recorrer las matrices de manera análoga a como hicimos en el primer ciclo.
  \newline
 
 \par Y por último, llamamos a solver\_set\_bnd dos veces, como hicimos antes, pero en este caso con las matrices $u$ y $v$.\newline
