@@ -1,13 +1,13 @@
 %Conclusión: Reflexión final sobre los alcances del trabajo práctico, la programación vectorial a bajo nivel, problemáticas %encontradas, y todo lo que consideren pertinente.
 
 \subsection{Implementación en código ASM}
-\par En implementación de función solver lin solve en lenguaje ASM se aprovechó la capacidad de los registros $xmm$ de manera que con cinco accesos a memoria obtenemos resultados de 4 puntos consecutivos, suponemos que el código C hace más accesos a memoria mirando su implementación. 
+\par En implementación de función solver lin solve en lenguaje ASM se aprovechó la capacidad de los registros $xmm$ de manera que con cinco accesos a memoria obtenemos resultados de 4 puntos consecutivos, suponemos que el código C hace más accesos a memoria mirando su implementación. Desempaquetando datos de single a double float no notamos mejora en resultados esperados (comparación hecha con resultados de cátedra). Obtuvimos precisión de $10*e-4$ en los resultados respecto a los resultados de la cátedra. 
 
 \subsection{Eficiencia C vs paralelismo simd ASM}
 Al comparar implementaciones en C y ASM de las funciones solver set bnd, solver lin solve y solver project obtuvimos que variando los parámetros se repetía una proporción de gasto temporal a favor de implementación ASM, menos gasto, y en contra de implementación C, más gasto temporal con código C. 
 \par En la función solver set bnd se observó gran diferencia en gastos temporales, la implementación C gastó alrededor de cinco veces el tiempo gastado por implementación ASM. Suponemos esto a causa de que la función llamadas a otras funciones.
 \par En la función solver lin solve se observó marcada diferencia en tiempo de ejecución, código C gastó alrededor del doble de tiempo que código ASM. Suponemos que la llamada a otra función influencia en la disminución de diferencia de tiempos, menor diferencia comparada a lo obtenido en función solver set bnd.
 \par En función solver project se observó poca diferencia en tiempos de ejecución, implementación C gastó alrededor de un tercio de tiempo que código ASM. Suponemos esto debido a las repetidas llamadas a otras funciones que se hace en el código.
-\par En general se observa ventaja temporal usando implementación ASM.
+\par En general se observa ventaja temporal usando implementación ASM.\\
 
 Queda como pendiente analizar tiempos de ejecución optimizando el compilador con opciones ($O1, 02$ y $03$).
