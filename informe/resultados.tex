@@ -5,7 +5,7 @@
  
 Se evaluó el código en assembler, llamado ASM, y código C de la función solver set bound sobre seis tamaños distintos de matrices. Al variar parámetro $b$, valores de 1, 2, 3 y 10, se obtienen promedios similares en caso de matriz con tamaño 512x512 (ver tabla), sacando outliers. Los resultados se mantienen alrededor de 18500 ticks para ASM y 54000 ticks para C. 
 Repetimos escenario con matriz de tamaño 16x16, variando $b$ en mismos valores que para tamaño 512x512. Aunque se nota 
-variación de tiempos entre mediciones no se nota gran cambio en los resultados, manteniendose el promedio de tiempos C alrededor de 2000 ticks y tiempos ASM alrededor de 350 ticks.\newline
+variación de tiempos entre mediciones (ver cuadro 1) no se nota gran cambio en los resultados, manteniendose el promedio de tiempos C alrededor de 2000 ticks y tiempos ASM alrededor de 350 ticks.\newline
 \begin{table}[htbp]
 \begin{center}
 \begin{tabular}{|l|l|l|}
@@ -82,7 +82,7 @@ $solver\_lin\_solve\_b10\_3raOp\_a\_y\_c\_512$ & 2.337076e+08 & 1.611139e+08\\ \
 %\label{tabla:sencilla}
 \end{center}
 \end{table}
- Se ve en la cuadro 2 que se repite una proporción de casi el doble de gasto temporal en ejecuciones C respecto a ejecuciones ASM. Entonces decidimos elegir parámetros de $1erOp\_a\_y\_c$, $b = 2$ y las matrices. $solver\rightarrow u$, $solver\rightarrow v$.
+ Se ve en la cuadro 2 que se repite una proporción de casi el doble de gasto temporal en ejecuciones C respecto a ejecuciones ASM. Entonces decidimos elegir parámetros de $1erOp\_a\_y\_c$, $b = 2$ y las matrices $solver\rightarrow u$, $solver\rightarrow v$.
  Con estos parámetros variamos el tamaño de las matrices y graficamos los tiempos (ver figura 3).
 \begin{figure}[h]
 
@@ -94,7 +94,7 @@ $solver\_lin\_solve\_b10\_3raOp\_a\_y\_c\_512$ & 2.337076e+08 & 1.611139e+08\\ \
 Se observa notable diferencia de gasto temporal, código C gasta más ticks que ASM.
 
 \subsection{Función solver project}
-Hemos medido la función sobre cuatro matrices diferentes: $1erOp$ que comienza con valor (0.1,0.2) en posición (0,0) y luego a medida que avanzamos en posiciones se incrementa en uno el valor en posición anterior y se asigna ese resultado, $2daOp$ con mismo proceso pero comenzando en (0.09,-100), $3eraOp$ comenzando en (-10,0.08) y $4taOp$ comenzando en (1000,2000). Se evalúan matrices con tamaño 16x16 y 512x512 para observar si hay gran cambio en las proporciones de tiempo al ejecutar código. Se observa en tabla los resultados y se ve que 
+Hemos medido la función sobre cuatro matrices diferentes: $1erOp$ que comienza con valor (0.1,0.2) en posición (0,0) y luego a medida que avanzamos en posiciones se incrementa en uno el valor en posición anterior y se asigna ese resultado, $2daOp$ con mismo proceso pero comenzando en (0.09,-100), $3eraOp$ comenzando en (-10,0.08) y $4taOp$ comenzando en (1000,2000). Se evalúan matrices con tamaño 16x16 y 512x512 para observar si hay gran cambio en las proporciones de tiempo al ejecutar código. Se observa en cuadro 3 los resultados y se ve que 
 para ambos tamaños el código C gasta alrededor de un tercio más que tiempo gastado por código ASM. 
  
 
@@ -135,7 +135,7 @@ A causa de que al variar la matriz obtenemos resultados similares, alrededor de 
    \caption{Tiempos en ticks de ejecución de código C vs código ASM para función solver project}
 \end{figure}
 
-Observando la gráfica vemos que en este caso la diferencia de tiempos no es tan grande. Notamos que el código de la función hace repetidamente llamadas a las otras funciones: solver set bnd y solver lin solve. Aunque a medida que el tamaño de matriz aumenta las curvas que representan los gastos de tiempo tienden a separarse.
+Observando la gráfica vemos que en este caso la diferencia de tiempos no es tan grande. Notamos que el código de la función hace repetidamente llamadas a las otras funciones: solver set bnd y solver lin solve. Se ve que a medida que el tamaño de matriz aumenta las curvas que representan los gastos de tiempo tienden a separarse.
 
 
 
