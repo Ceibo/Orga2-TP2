@@ -2,11 +2,13 @@
 \contentsline {section}{\numberline {1}Introducci\IeC {\'o}n}{2}
 \contentsline {section}{\numberline {2}Desarrollo}{2}
 \contentsline {subsection}{\numberline {2.1}Funci\IeC {\'o}n solver\_lin\_solve}{2}
-\contentsline {subsection}{\numberline {2.2}Funci\IeC {\'o}n solver\_set\_bnd}{4}
+\contentsline {subsection}{\numberline {2.2}Funci\IeC {\'o}n solver\_set\_bnd}{5}
 \contentsline {subsection}{\numberline {2.3}Funci\IeC {\'o}n solver\_project}{5}
-\contentsline {subsection}{\numberline {2.4}Eficiencia c vs paralelismo SIMD asm}{6}
-\contentsline {section}{\numberline {3}Resultados}{6}
-\contentsline {subsection}{\numberline {3.1}Funci\IeC {\'o}n solver set bnd}{6}
-\contentsline {subsection}{\numberline {3.2}Funci\IeC {\'o}n solver lin solve}{7}
-\contentsline {subsection}{\numberline {3.3}Funci\IeC {\'o}n solver project}{7}
+\contentsline {subsection}{\numberline {2.4}Eficiencia C vs paralelismo simd ASM}{6}
+\contentsline {section}{\numberline {3}Resultados}{7}
+\contentsline {subsection}{\numberline {3.1}Funci\IeC {\'o}n solver set bnd}{7}
+\contentsline {subsection}{\numberline {3.2}Funci\IeC {\'o}n solver lin solve}{8}
+\contentsline {subsection}{\numberline {3.3}Funci\IeC {\'o}n solver project}{8}
 \contentsline {section}{\numberline {4}Conclusi\IeC {\'o}n}{9}
+\contentsline {subsection}{\numberline {4.1}Implementaci\IeC {\'o}n en c\IeC {\'o}digo ASM}{9}
+\contentsline {subsection}{\numberline {4.2}Eficiencia C vs paralelismo simd ASM}{9}
