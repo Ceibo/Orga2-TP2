@@ -15,9 +15,15 @@ Adentro tenemos otro ciclo donde se recorren las filas de a una. \newline
  $xmm\_left$ y avanzamos dos posiciones para un $3er$ fetch de a cuatro en un $xmm$ llamado $xmm\_right$.
  En la siguiente fila fetcheamos de a cuatro en un $xmm$ llamado $xmm\_techo$. Los elementos cargados desde $x$ forman un bloque de elementos (ver figura 1 $(a)$) de donde vamos a obtener cuatro resultados a partir de seis accesos a memoria.
  Por otra parte de matriz $x0$ fetcheamos cuatro elementos consecutivos en un $xmm$ llamado $xmm\_x0$.\newline
+\begin{figure}[h]
 
+\centering
+\includegraphics[scale=0.6] {celdas_xmm}
+  
+ \caption{(a) Bloque de elementos de matriz $x$. (b) Sumandos de $x$ en código $c$. (c) Empacado de elementos de $x0$.}
+\end{figure} 
 \par Representamos en figura 1 $(c)$ los sumandos de matriz $x$ que aparecen en cuerpo de ciclo principal 
- en código $c$ (figura 2):
+ en código $c$ (ver código $solver\_lin\_solve$ en $solver.c$):
  up representa al sumando $x[IX(i,j+1)]$, down a $x[IX(i,j-1)]$, left a $x[IX(i-1,j)$ y right a 
  $x[IX(i+1,j)]$. Por último middle representa a sumando $x0[IX(i,j)]$. En bloque de figura 1 $(a)$ vemos que $xmm\_techo$ empaca a los cuatro sumandos up, $xmm\_piso$
 empaca a los cuatro down y $xmm\_right$ empaca a los cuatro right de los cuatro puntos centrales del bloque. También vemos, en figura 1 $(b)$, que $xmm\_x0$ empaca a los cuatro middle asociados a los puntos centrales del bloque.
@@ -110,6 +116,6 @@ Luego vamos a recorrer las matrices de manera análoga a como hicimos en el prim
 
 \par Y por último, llamamos a solver\_set\_bnd dos veces, como hicimos antes, pero en este caso con las matrices $u$ y $v$.\newline
 
-\subsection{Eficiencia c vs paralelismo SIMD asm}
-Nuestra hipótesis es que código asm con instrucciones SIMD aprovecha el uso de vectores más eficientemente que código C. Para averiguar esto hemos planteado experimento en que seleccionamos tamaño de matriz, en atributos de estructura solver, y testeamos los tiempos en ticks que tardan la ejecución de cada código. Los tamaños elegidos son los que usa la cátedra para la demo 2, es decir tamaños de 16x16, 32x32, 64x64, 128x128, 256x256 y 512x512. Se repiten 100 veces la ejecución de cada código, c y asm, para cada tamaño y luego se promedian evitando los outliers. Entonces se comparan los promedios y se sacan conclusiones.
+\subsection{Eficiencia C vs paralelismo simd ASM}
+Nuestra hipótesis es que código ASM con instrucciones simd aprovecha el uso de vectores más eficientemente que código C. Para averiguar esto hemos planteado experimento en que seleccionamos tamaño de matriz, en atributos de estructura solver, y testeamos los tiempos en ticks que tardan la ejecución de cada código. Los tamaños elegidos son los que usa la cátedra para la demo 2, es decir tamaños de 16x16, 32x32, 64x64, 128x128, 256x256 y 512x512. Se repiten 100 veces la ejecución de cada código, C y ASM, para cada tamaño y luego se promedian evitando los outliers. Entonces se comparan los promedios y se sacan conclusiones.
 
