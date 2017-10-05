@@ -104,3 +104,7 @@ Ahora en el segundo ciclo, trabajamos sobre las matrices $u$ y $v$ de solver (am
 En este caso lo único que cambia respecto del ciclo anterior es que las operaciones son sobre otras matrices, pero son del mismo tamaño que antes y las recorremos analogamente a como hicimos anteriormente.\newline
 
 \par Y por último, llamamos a solver\_set\_bnd dos veces, como hicimos antes, pero en este caso con las matrices $u$ y $v$.\newline
+
+\subsection{Eficiencia c vs paralelismo simd asm}
+Nuestra hipótesis es que código asm con instrucciones simd aprovecha el uso de vectores más eficientemente que código C. Para averiguar esto hemos planteado experimento en que seleccionamos tamaño de matriz, en atributos de estructura solver, y testeamos los tiempos en ticks que tardan la ejecución de cada código. Los tamaños elegidos son los que usa la cátedra para la demo 2, es decir tamaños de 16x16, 32x32, 64x64, 128x128, 256x256 y 512x512. Se repiten 100 veces la ejecución de cada código, c y asm, para cada tamaño y luego se promedian evitando los outliers. Entonces se comparan los promedios y se sacan conclusiones.
+
