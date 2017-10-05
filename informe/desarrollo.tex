@@ -22,11 +22,11 @@ Adentro tenemos otro ciclo donde se recorren las filas de a una. \newline
   
  \caption{(a) Bloque de elementos de matriz $x$. (b) Sumandos de $x$ en código $c$. (c) Empacado de elementos de $x0$.}
 \end{figure} 
-\par Representamos en figura 1 $(c)$ los sumandos de matriz $x$ que aparecen en cuerpo de ciclo principal 
+\par Representamos en figura 1 $(b)$ los sumandos de matriz $x$ que aparecen en cuerpo de ciclo principal 
  en código $c$ (ver código $solver\_lin\_solve$ en $solver.c$):
  up representa al sumando $x[IX(i,j+1)]$, down a $x[IX(i,j-1)]$, left a $x[IX(i-1,j)$ y right a 
  $x[IX(i+1,j)]$. Por último middle representa a sumando $x0[IX(i,j)]$. En bloque de figura 1 $(a)$ vemos que $xmm\_techo$ empaca a los cuatro sumandos up, $xmm\_piso$
-empaca a los cuatro down y $xmm\_right$ empaca a los cuatro right de los cuatro puntos centrales del bloque. También vemos, en figura 1 $(b)$, que $xmm\_x0$ empaca a los cuatro middle asociados a los puntos centrales del bloque.
+empaca a los cuatro down y $xmm\_right$ empaca a los cuatro right de los cuatro puntos centrales del bloque. También vemos, en figura 1 $(c)$, que $xmm\_x0$ empaca a los cuatro middle asociados a los puntos centrales del bloque.
 La idea que usamos para paralelizar cálculos es sumar los valores de los registros $xmm\_piso$,
 $xmm\_techo$ y $xmm\_right$ en paralelo obteniendo cuatro sumas parciales.
 Luego completar la suma alrededor de un punto individualmente, a causa de dependencia de vecino izquierdo, sumando up, down, left y right, comenzando con entorno de primero de los cuatro puntos centrales. Terminar las operaciones sobre ese punto, usando primer middle empaquetado en $xmm\_x0$, y pasar a operar sobre vecino derecho usando como sumando left de este al resultado obtenido.
