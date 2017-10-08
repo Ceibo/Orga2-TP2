@@ -1,9 +1,5 @@
- 
-
- 
-\subsection{Función solver set bnd}
- 
-Se evaluó el código en assembler, llamado ASM, y código C de la función solver set bound sobre seis tamaños distintos de matrices. Al variar parámetro $b$, valores de 1, 2, 3 y 10, se obtienen promedios similares en caso de matriz con tamaño 512x512 (ver tabla), sacando outliers. Los resultados se mantienen alrededor de 18500 ticks para ASM y 54000 ticks para C. 
+\subsection{Función solver\_set\_bnd}
+\par Se evaluó el código en assembler, llamado ASM, y código C de la función solver set bound sobre seis tamaños distintos de matrices. Al variar parámetro $b$, valores de 1, 2, 3 y 10, se obtienen promedios similares en caso de matriz con tamaño 512x512 (ver tabla), sacando outliers. Los resultados se mantienen alrededor de 18500 ticks para ASM y 54000 ticks para C. 
 Repetimos escenario con matriz de tamaño 16x16, variando $b$ en mismos valores que para tamaño 512x512. Aunque se nota 
 variación de tiempos entre mediciones (ver cuadro 1) no se nota gran cambio en los resultados, manteniendose el promedio de tiempos C alrededor de 2000 ticks y tiempos ASM alrededor de 350 ticks.\newline
 \begin{table}[htbp]
@@ -23,23 +19,23 @@ $solver\_set\_bnd\_100\_512\_b2$  & 54054.041667 & 19752.25000 \\ \hline
 $solver\_set\_bnd\_100\_512\_b3$  &  54835.708333 & 18544.926316 \\ \hline
 
 \end{tabular}
-\caption{Tabla de promedios ticks función solver set bnd para tamaños 16x16 y 512x512.}
+\caption{Tabla de promedios ticks función solver\_set\_bnd para tamaños 16x16 y 512x512.}
 %\label{tabla:sencilla}
 \end{center}
 \end{table}
-A causa de esto y de que no queremos llenar de gráficas innecesarias hemos decidido fijar el parámetro $b$ en 2 para restantes experimentaciones de función. 
+\par A causa de esto y de que no queremos llenar de gráficas innecesarias hemos decidido fijar el parámetro $b$ en 2 para restantes experimentaciones de función. 
 Se muestra en figura 2 promedio de ticks gastado en ejecución de los códigos, donde para cada tamaño los códigos se ejecutaron 100 veces.
 \begin{figure}[h]
 
 \centering
 \includegraphics[scale=0.6] {grafica_set_bound}
   
- \caption{Tiempos en ticks de ejecución de código C vs código ASM para función solver set bnd}
+ \caption{Tiempos en ticks de ejecución de código C vs código ASM para función solver\_set\_bnd}
 \end{figure} \\
 Se ve que el código C gasta más tiempo que código ASM, agrandandose esta diferencia a medida que aumenta el tamaño de matriz.
 
-\subsection{Función solver lin solve}
-En este caso hemos variado los parámetros $a,b$ y $c$ para tamaños de matriz 16x16 y 512x512. En la tabla siguiente se muestran los promedios obtenidos sobre datos sin outliers para valores de: $a = 1.0f $y $c = 4.0f$, llamado $1erOp\_a\_y\_c$, $a = 0.3f$ y $c = 2.8f$, llamado $2daOp\_a\_y\_c$, y $a = -10.0f$, $c = 0.02f$, llamado $3raOp\_a\_y\_c$. Los valores de $b$ son: 1, 2, 3 y 10. En el caso de tamaño 16x16 obtenemos que el promedio de tiempos de ejecución sin outliers para código en C está alrededor de los 400000 ticks y para código ASM está alrededor de 300000 ticks. En el caso de tamaño 512x5122 se obtiene que promedio de tiempos C está alrededor de $2.3*e+08$ y tiempos ASM está alrededor de $1.6*e+08 $ ticks.\newline
+\subsection{Función solver\_lin\_solve}
+\par En este caso hemos variado los parámetros $a,b$ y $c$ para tamaños de matriz 16x16 y 512x512. En la tabla siguiente se muestran los promedios obtenidos sobre datos sin outliers para valores de: $a = 1.0f $y $c = 4.0f$, llamado $1erOp\_a\_y\_c$, $a = 0.3f$ y $c = 2.8f$, llamado $2daOp\_a\_y\_c$, y $a = -10.0f$, $c = 0.02f$, llamado $3raOp\_a\_y\_c$. Los valores de $b$ son: 1, 2, 3 y 10. En el caso de tamaño 16x16 obtenemos que el promedio de tiempos de ejecución sin outliers para código en C está alrededor de los 400000 ticks y para código ASM está alrededor de 300000 ticks. En el caso de tamaño 512x5122 se obtiene que promedio de tiempos C está alrededor de $2.3*e+08$ y tiempos ASM está alrededor de $1.6*e+08 $ ticks.\newline
 \begin{table}[htbp]
 \begin{center}
 \begin{tabular}{|l|l|l|}
@@ -78,24 +74,24 @@ $solver\_lin\_solve\_b1\_3raOp\_a\_y\_c\_512$ & 2.343117e+08  & 1.585373e+08\\ \
 $solver\_lin\_solve\_b10\_3raOp\_a\_y\_c\_512$ & 2.337076e+08 & 1.611139e+08\\ \hline
 
 \end{tabular}
-\caption{Tabla de promedios ticks función solver lin solve para tamaños 16x16 y 512x512.}
+\caption{Tabla de promedios ticks función solver\_lin\_solve para tamaños 16x16 y 512x512.}
 %\label{tabla:sencilla}
 \end{center}
 \end{table}
- Se ve en la cuadro 2 que se repite una proporción de casi el doble de gasto temporal en ejecuciones C respecto a ejecuciones ASM. Entonces decidimos elegir parámetros de $1erOp\_a\_y\_c$, $b = 2$ y las matrices $solver\rightarrow u$, $solver\rightarrow v$.
+\par Se ve en la cuadro 2 que se repite una proporción de casi el doble de gasto temporal en ejecuciones C respecto a ejecuciones ASM. Entonces decidimos elegir parámetros de $1erOp\_a\_y\_c$, $b = 2$ y las matrices $solver\rightarrow u$, $solver\rightarrow v$.
  Con estos parámetros variamos el tamaño de las matrices y graficamos los tiempos (ver figura 3).
 \begin{figure}[h]
 
 \centering
 \includegraphics[scale=0.6] {solver_lin_solve}
   
- \caption{Tiempos en ticks de ejecución de código C vs código ASM para función solver lin solve}
-\end{figure} \\
+ \caption{Tiempos en ticks de ejecución de código C vs código ASM para función solver\_lin\_solve}
+\end{figure}
 Se observa notable diferencia de gasto temporal, código C gasta más ticks que ASM.
 
-\subsection{Función solver project}
-Hemos medido la función sobre cuatro matrices diferentes: $1erOp$ que comienza con valor (0.1,0.2) en posición (0,0) y luego a medida que avanzamos en posiciones se incrementa en uno el valor en posición anterior y se asigna ese resultado, $2daOp$ con mismo proceso pero comenzando en (0.09,-100), $3eraOp$ comenzando en (-10,0.08) y $4taOp$ comenzando en (1000,2000). Se evalúan matrices con tamaño 16x16 y 512x512 para observar si hay gran cambio en las proporciones de tiempo al ejecutar código. Se observa en cuadro 3 los resultados y se ve que 
-para ambos tamaños el código C gasta alrededor de un tercio más que tiempo gastado por código ASM. 
+\subsection{Función solver\_project}
+\par Hemos medido la función sobre cuatro matrices diferentes: $1erOp$ que comienza con valor (0.1,0.2) en posición (0,0) y luego a medida que avanzamos en posiciones se incrementa en uno el valor en posición anterior y se asigna ese resultado, $2daOp$ con mismo proceso pero comenzando en (0.09,-100), $3eraOp$ comenzando en (-10,0.08) y $4taOp$ comenzando en (1000,2000). Se evalúan matrices con tamaño 16x16 y 512x512 para observar si hay gran cambio en las proporciones de tiempo al ejecutar código. Se observa en cuadro 3 los resultados y se ve que 
+para ambos tamaños el código C gasta alrededor de un tercio más que tiempo gastado por código ASM.\newline
  
 
 \begin{table}[htbp]
@@ -122,20 +118,20 @@ $solver\_project\_2daOp\_matrices\_512$ & 1.939796e+08 &  3.205834e+06   & 1.591
 $solver\_project\_4taOp\_matrices\_512$ & 1.938470e+08 & 2.764452e+06   & 1.670031e+08 & 8.623912e+06\\ \hline
 
 \end{tabular}
-\caption{Tabla de promedios ticks función solver project para tamaños 16x16 y 512x512. SD es desvío estandar.}
+\caption{Tabla de promedios ticks función solver\_project para tamaños 16x16 y 512x512. SD es desvío estandar.}
 %\label{tabla:sencilla}
 \end{center}
 \end{table}
 
-A causa de que al variar la matriz obtenemos resultados similares, alrededor de 380000 ticks en código C y alrededor de 270000 en asm para tamaño 16x16 (ver tabla), hemos decidido evaluar los códigos sobre matriz $1erOp$. En la gráfica se muestran los promedios para distintos tamaños (figura 4).
-\begin{figure}[h]
+\par A causa de que al variar la matriz obtenemos resultados similares, alrededor de 380000 ticks en código C y alrededor de 270000 en asm para tamaño 16x16 (ver tabla), hemos decidido evaluar los códigos sobre matriz $1erOp$. En la gráfica se muestran los promedios para distintos tamaños (figura 4).\newline
 
+\begin{figure}[h]
 \centering
 \includegraphics[scale=0.6] {solver_project}
-   \caption{Tiempos en ticks de ejecución de código C vs código ASM para función solver project}
+   \caption{Tiempos en ticks de ejecución de código C vs código ASM para función solver\_project}
 \end{figure}
 
-Observando la gráfica vemos que en este caso la diferencia de tiempos no es tan grande. Notamos que el código de la función hace repetidamente llamadas a las otras funciones: solver set bnd y solver lin solve. Se ve que a medida que el tamaño de matriz aumenta las curvas que representan los gastos de tiempo tienden a separarse.
+\par Observando la gráfica vemos que en este caso la diferencia de tiempos no es tan grande. Notamos que el código de la función hace repetidamente llamadas a las otras funciones: solver\_set\_bnd y solver\_lin\_solve. Se ve que a medida que el tamaño de matriz aumenta las curvas que representan los gastos de tiempo tienden a separarse.
 
 
 
