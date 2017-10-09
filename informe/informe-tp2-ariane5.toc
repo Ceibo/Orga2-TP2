@@ -1,8 +1,8 @@
 \select@language {spanish}
 \contentsline {section}{\numberline {1}Introducci\IeC {\'o}n}{2}
 \contentsline {section}{\numberline {2}Desarrollo}{2}
-\contentsline {subsection}{\numberline {2.1}Funci\IeC {\'o}n solver\_lin\_solve}{2}
-\contentsline {subsection}{\numberline {2.2}Funci\IeC {\'o}n solver\_set\_bnd}{5}
+\contentsline {subsection}{\numberline {2.1}Funci\IeC {\'o}n solver\_set\_bnd}{2}
+\contentsline {subsection}{\numberline {2.2}Funci\IeC {\'o}n solver\_lin\_solve}{3}
 \contentsline {subsection}{\numberline {2.3}Funci\IeC {\'o}n solver\_project}{5}
 \contentsline {section}{\numberline {3}Resultados}{7}
 \contentsline {subsection}{\numberline {3.1}Funci\IeC {\'o}n solver\_set\_bnd}{7}
