@@ -1,0 +1,15 @@
+1 - Para obtener medidas correr resultados y especificar como 2do parámetro función, 
+3er parámetro a tamanio y 4to parámetro a caso.
+Ejemplo de ejecución: ./resultados solver_set_bnd tamanios_full casos_full
+Parámetros:
+- tamanios_full significa todos los tamanios a evaluar, caso contrario se evalúa tamanios: 16 y 512.
+- casos_full significa evaluar todos los casos, caso contrario se evalúa un solo caso: 1er caso.
+
+2 - Una vez obtenido las medidas obtener promedio por tamanio usando jupyter, correr 
+archivo promedios.ipynb, y cada uno de los archivos obtenidos.
+
+3 - Con los promedios armar un csv file y graficarlos con jupyter, correr archivo
+ graficar_asm_vs_c.ipynb.
+ 
+
+
