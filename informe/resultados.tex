@@ -3,40 +3,24 @@
  
 \subsection{Función Solver Set Bnd }
  \subsubsection{Compilación hecha con gcc en opción o0} 
-Empezamos restringiéndonos a tamaños 16x16 y 512x512 de manera que si observamos tendencia evitaremos evaluar todos los tamaños con todas las variaciones de parámetros. Al variar parámetro $b$, valores de 1, 2, 3 y 10, se obtienen promedios similares en caso de matriz con tamaño 512x512 (ver Cuadro 1), alrededor de 50000 ticks para código C, sacando outliers. En caso de implementación ASM se siente levemente mayor gasto con $b$ mayor a 2 y menor gasto con $b$ igual a 1 y 2, aunque se mantiene alrededor de los 16000 ticks, menor a los de C. El desvío estandar en caso C supera los 3000 ticks y para ASM supera los 1000 ticks, levemente dispersos alrededor de la media en ambos casos. Con esto, y el porcentaje de datos con el que se promedió (columna $\%$), tomamos al promedio como representante de la mayoría de las muestras.\\
-Repetimos escenario con matriz de tamaño 16x16, variando $b$ en mismos valores que para tamaño 512x512. Aunque se nota 
-variación de tiempos entre mediciones no se nota gran cambio en los resultados, manteniendose el promedio de tiempos C alrededor de 1800 ticks, con desvío estandar arriba de 100 ticks, tiempos ASM alrededor de 350 ticks, con leve variación, igual que para caso 512x512 a causa de distintas variantes de $b$, y desvío estandar alrededor de 50 ticks para ASM.
-Se observa en caso de 16x16 que para distintos valores de $b$ la proporción de gasto temporal de código C se mantiene en 
+Empezamos restringiéndonos a tamaños 16x16 y 512x512 de manera que si observamos tendencia evitaremos evaluar todos los tamaños con todas las variaciones de parámetros. Al variar parámetro $b$, y sacando outliers de los resultados, se obtienen promedios similares en caso de matriz con tamaño 512x512 (ver Figura $2(b)$), alrededor de 0.025 microsegundos para código C. En caso de implementación ASM se siente levemente mayor gasto con $b$ mayor a 2 y menor gasto con $b$ igual a 1 y 2, aunque se mantiene alrededor de los 0.008 microsegundos, menor a los de C. El desvío estandar en caso C supera los 0.003 microsegundos y para ASM supera los 0.0008 microsegundos, levemente dispersos alrededor de la media en ambos casos. Con esto, y el porcentaje de datos con el que se promedió, arriba del 70$\%$ de datos no outliers para las distintas variantes de $b$, tomamos al promedio como representante de la mayoría de las muestras.\\
+Repetimos escenario con matriz de tamaño 16x16 (ver Figura $2(a)$). Aunque se nota variación de tiempos entre mediciones no se nota gran cambio en los resultados, manteniendose el promedio de tiempos C alrededor de 0.0009 microsegundos, con desvío estandar arriba de 0.0001 microsegundos, tiempos ASM alrededor de 0.0002 microsegundos, con leve variación, igual que para caso 512x512 a causa de distintas variantes de $b$, y desvío estandar alrededor de 0.00004 microsegundos para ASM. El porcentaje de datos no outliers quedó por arriba del 85$\%$ para las distintas $b$s,
+Se observa en este caso, tamaño 16x16, que para distintos valores de $b$ la proporción de gasto temporal de código C se mantiene en 
 seis veces el gasto que tiene código ASM. A causa de esta tendencia decidimos fijar $b$ en 1 y evaluar en todos los tamaños propuestos a la función. 
 \newline
 
+ \begin{figure}[htbp]
+\centering
 
-\begin{table}[htbp]
-\begin{center}
-\begin{tabular}{|l|l|l|l|l|l|l|}
-\hline
-  & C & $\%$ &  SD(C)  & ASM & $\%$  & SD(ASM)\\
-\hline \hline
-$solver\_set\_bnd\_100\_16\_b1$ & 1728.802  & 96 &176.465  & 308.638  & 94 & 51.883 \\ \hline
-$solver\_set\_bnd\_100\_16\_b2$  & 1766.234 & 98 & 203.315  &  313.909  & 88 & 13.749 \\ \hline
-$solver\_set\_bnd\_100\_16\_b3$  & 1838.315  & 92 &133.411  & 388.340  & 94 & 66.619  \\ \hline
-$solver\_set\_bnd\_100\_16\_b4$  & 1746.914  & 94 & 115.583  & 399.156  &  96 & 78.437 \\ 
-\hline \hline
-$solver\_set\_bnd\_100\_512\_b1$  & 50553.760  & 75 &7963.533   & 15610.465  & 73 &1270.874  \\ \hline
+\subfigure[Solver Set Bnd full b tamaño 16x16]{\includegraphics[width=70mm]{solver_set_bnd_16_full_b}}
+\subfigure[Solver Set Bnd full b tamaño 512x512]{\includegraphics[width=70mm]{set_bnd_512_full_b}}  
 
-$solver\_set\_bnd\_100\_512\_b2$  & 45526.361  & 83 & 3697.485  & 15732.926  & 82 & 1622.451  \\ \hline
+\caption{Tiempos en ticks de ejecución de código C vs código ASM para función Solver Set Bnd.} \label{fig:lego}
+\end{figure}
 
-$solver\_set\_bnd\_100\_512\_b3$  &   51947.550  & 80 & 4330.216  & 17793.384  &78 & 1225.667 \\ \hline
 
-$solver\_set\_bnd\_100\_512\_b4$  & 49148.481  & 83 & 3601.135   & 17413.631 & 76 & 1530.499 \\ \hline
 
-\end{tabular}
-\caption{Tabla de promedios de función Solver Set Bnd para tamaños 16x16 y 512x512. Columna $\%$ es porcentaje de datos (no outlier) con que se promedió. SD es desviación estandar.}
-%\label{tabla:sencilla}
-\end{center}
-\end{table}
-
-Se muestra en Figura 2$(a)$ promedio de ticks gastado en ejecución de los códigos, donde para cada tamaño los códigos se ejecutaron 100 veces.
+Se muestra en Figura 3$(a)$ promedio de ticks gastado en ejecución de los códigos, donde para cada tamaño los códigos se ejecutaron 100 veces.
 %\begin{figure}[h]
 
 %\centering
@@ -59,26 +43,12 @@ Se ve que el código C gasta más tiempo que código ASM, achicándose esta dife
 
 \subsubsection{Compilación hecha con gcc en opción o1}
 Repetimos parámetros de función ($b$ en 1) para poder comparar las gráficas. El resultado se observa en Figura 2$(b)$.
-%\begin{figure}[h]
-
-%\centering
-%\includegraphics[scale=0.6] {solver_set_bnd_1}
-  
-% \caption{Tiempos en ticks de ejecución de código C vs código ASM para función solver set bnd y gcc en opción o1.}
-%\end{figure} 
+ 
 No se nota mejora en tiempos C, ambas gráficas, la de Solver Set Bnd y gcc o0 junto a la de Solver Set Bnd y gcc o1, muestran comportamientos similares. Tal vez observe algo en siguiente opción de optimización.
-
-
 
 \subsubsection{Compilación hecha con gcc en opción o3}
 Usamos mismas opciones de $b$ que para anteriores mediciones, $b$ en 1. El resultado se muestra en Figura 2$(c)$.
-%\begin{figure}[h]
-
-%\centering
-%\includegraphics[scale=0.6] {solver_set_bnd_3}
-  
-% \caption{Tiempos en ticks de ejecución de código C vs código ASM para función solver set bnd y gcc en opción o3.}
-%\end{figure} 
+ 
 No vemos mejora en tiempos C, variando apenas los tiempos de este código a favor y en contra. 
 
 \subsection{Función Solver Lin Solve}
