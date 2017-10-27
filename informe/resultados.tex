@@ -3,7 +3,7 @@
  
 \subsection{Función Solver Set Bnd }
  \subsubsection{Compilación hecha con gcc en opción o0} 
-Empezamos restringiéndonos a tamaños 16x16 y 512x512 de manera que si observamos tendencia evitaremos evaluar todos los tamaños con todas las variaciones de parámetros. Al variar parámetro $b$, y sacando outliers de los resultados, se obtienen promedios similares en caso de matriz con tamaño 512x512 (ver Figura $2(b)$), alrededor de 0.025 microsegundos para código C. En caso de implementación ASM se siente levemente mayor gasto con $b$ mayor a 2 y menor gasto con $b$ igual a 1 y 2, aunque se mantiene alrededor de los 0.008 microsegundos, menor a los de C. El desvío estandar en caso C supera los 0.003 microsegundos y para ASM supera los 0.0008 microsegundos, levemente dispersos alrededor de la media en ambos casos. Con esto, y el porcentaje de datos con el que se promedió, arriba del 70$\%$ de datos no outliers para las distintas variantes de $b$, tomamos al promedio como representante de la mayoría de las muestras.\\
+Empezamos restringiéndonos a tamaños 16x16 y 512x512, el tamaño más chico y el más grande respectivamente, de manera que si observamos tendencia evitaremos evaluar todos los tamaños con todas las variaciones de parámetros. Al variar parámetro $b$, y sacando outliers (valores arriba de dos veces el desvío estandar) de los resultados se obtienen promedios similares en caso de matriz con tamaño 512x512 (ver Figura $2(b)$), alrededor de 0.025 microsegundos para código C. En caso de implementación ASM se siente levemente mayor gasto con $b$ mayor a 2 y menor gasto con $b$ igual a 1 y 2, aunque se mantiene alrededor de los 0.008 microsegundos, menor a los de C. El desvío estandar en caso C supera los 0.003 microsegundos y para ASM supera los 0.0008 microsegundos, levemente dispersos alrededor de la media en ambos casos. Con esto, y el porcentaje de datos con el que se promedió, arriba del 70$\%$ de datos no outliers para las distintas variantes de $b$, tomamos al promedio como representante de la mayoría de las muestras.\\
 Repetimos escenario con matriz de tamaño 16x16 (ver Figura $2(a)$). Aunque se nota variación de tiempos entre mediciones no se nota gran cambio en los resultados, manteniendose el promedio de tiempos C alrededor de 0.0009 microsegundos, con desvío estandar arriba de 0.0001 microsegundos, tiempos ASM alrededor de 0.0002 microsegundos, con leve variación, igual que para caso 512x512 a causa de distintas variantes de $b$, y desvío estandar alrededor de 0.00004 microsegundos para ASM. El porcentaje de datos no outliers quedó por arriba del 85$\%$ para las distintas $b$s,
 Se observa en este caso, tamaño 16x16, que para distintos valores de $b$ la proporción de gasto temporal de código C se mantiene en 
 seis veces el gasto que tiene código ASM. A causa de esta tendencia decidimos fijar $b$ en 1 y evaluar en todos los tamaños propuestos a la función. 
@@ -12,22 +12,16 @@ seis veces el gasto que tiene código ASM. A causa de esta tendencia decidimos f
  \begin{figure}[htbp]
 \centering
 
-\subfigure[Solver Set Bnd full b tamaño 16x16]{\includegraphics[width=70mm]{solver_set_bnd_16_full_b}}
-\subfigure[Solver Set Bnd full b tamaño 512x512]{\includegraphics[width=70mm]{set_bnd_512_full_b}}  
+\subfigure[Promedios para tamaño 16x16.]{\includegraphics[width=70mm]{barplot_set_bnd_16_full_b_gcc_0}}
+\subfigure[Promedios para tamaño 512x512.]{\includegraphics[width=70mm]{bar_plot_solver_set_bnd_512_full_b_gcc0}}  
 
-\caption{Tiempos en ticks de ejecución de código C vs código ASM para función Solver Set Bnd.} \label{fig:lego}
+\caption{Promedios de tiempo de ejecución para función Solver Set Bnd sobre distintas implementaciones al variar parámetro $b$ sobre las cuatro opciones.} \label{fig:lego}
 \end{figure}
 
 
 
-Se muestra en Figura 3$(a)$ promedio de ticks gastado en ejecución de los códigos, donde para cada tamaño los códigos se ejecutaron 100 veces.
-%\begin{figure}[h]
-
-%\centering
-%\includegraphics[scale=0.6] {solver_set_bnd_0}
-  
- %\caption{Tiempos en ticks de ejecución de código C vs código ASM para función solver set bnd y gcc en opción o0.}
-%\end{figure} 
+Se muestra en Figura 3$(a)$ promedio de ticks gastado en ejecución de los códigos, donde para cada tamaño los códigos fueron ejecutados 100 veces.
+ 
 
 \begin{figure}[htbp]
 \centering
@@ -36,63 +30,41 @@ Se muestra en Figura 3$(a)$ promedio de ticks gastado en ejecución de los códi
 \subfigure[Compilación hecha con gcc en opción o1]{\includegraphics[width=70mm]{solver_set_bnd_1}}
 \subfigure[Compilación hecha con gcc en opción o3]{\includegraphics[width=70mm]{solver_set_bnd_3}} 
 
-\caption{Tiempos en ticks de ejecución de código C vs código ASM para función Solver Set Bnd.} \label{fig:lego}
+\caption{Promedios de tiempos de ejecución para función Solver Set Bnd usando distintas opciones de optimización en compilador.} \label{fig:lego}
 \end{figure}
 
 Se ve que el código C gasta más tiempo que código ASM, achicándose esta diferencia a medida que aumenta el tamaño de matriz. Suponemos que esta ventaja de ASM sobre C se debe al uso de instrucciones SIMD en código ASM.
 
 \subsubsection{Compilación hecha con gcc en opción o1}
-Repetimos parámetros de función ($b$ en 1) para poder comparar las gráficas. El resultado se observa en Figura 2$(b)$.
+Repetimos parámetros de función ($b$ en 1) para poder comparar las gráficas. El resultado se observa en Figura 3$(b)$.
  
-No se nota mejora en tiempos C, ambas gráficas, la de Solver Set Bnd y gcc o0 junto a la de Solver Set Bnd y gcc o1, muestran comportamientos similares. Tal vez observe algo en siguiente opción de optimización.
+No se nota mejora en tiempos C, ambas gráficas, la de Solver Set Bnd y gcc o0 junto a la de Solver Set Bnd y gcc o1, muestran comportamientos similares.
 
 \subsubsection{Compilación hecha con gcc en opción o3}
-Usamos mismas opciones de $b$ que para anteriores mediciones, $b$ en 1. El resultado se muestra en Figura 2$(c)$.
+Usamos mismas opciones de $b$ que para anteriores mediciones, $b$ en 1. El resultado se muestra en Figura 3$(c)$.
  
 No vemos mejora en tiempos C, variando apenas los tiempos de este código a favor y en contra. 
 
 \subsection{Función Solver Lin Solve}
 
 \subsubsection{Compilación hecha con gcc en opción o0}
-En este caso hemos variado los parámetros $a,b$ y $c$ solamente para tamaños de matriz 16x16 y 512x512. En la tabla siguiente (Cuadro 2) se muestran los promedios obtenidos para $1erOp$, $2daOp$, $3raOp$ y $4taOp$. 
-Para tamaño 16x16 observamos que se destaca el caso $1erOp$, donde porcentaje de datos no outliers es del 49$\%$ pero observando la gráfica de los datos (no incluída) vemos que el 61$\%$ restante se reparte un 30$\%$ arriba y otro 30$\%$ abajo de los no outliers, y por lo tanto este 49$\%$ refleja el comportamiento de la mayoría de los datos. Por otra parte en caso $2daOp$ se observa pobre ventaja de código ASM, de alrededor del 10$\%$, sobre código C, mientras que en los otros casos se obtiene un porcentaje de ventaja a favor de ASM levemente mayor. Observando el desvío estandar, datos poco dispersos respecto a la media, y el porcentaje de datos promediados (no outliers), arriba del 60$\%$ para tiempos ASM y C, salvo caso señalado antes, decidimos aceptar al promedio como representación de la mayoría de los datos. Se observa misma situación para 512x512 que para 16x16, con pobre ventaja para caso $2daOp$. A causa de esto hemos decidido evaluar la función usando $2daOp$ para todos los tamaños propuestos: 16x16, 32x32, 64x64, 128x128, 256x256 y 512x512.
-  
-\begin{table}[htbp]
-\begin{center}
-\begin{tabular}{|l|l|l|l|l|l|l|}
-\hline
-  & C & $\%$ &  SD(C)  & ASM & $\%$  & SD(ASM)\\
-\hline \hline
-$solver\_lin\_solve\_1erOp\_16$ & 431840.428 & 49 & 5446.690 &  259397.065 & 61 &  1418.848\\ \hline
-
-$solver\_lin\_solve\_2daOp\_16$ &  311493.016 & 59 & 2738.276 &  288969.463 & 97 & 10882.715 \\ \hline
-
-$solver\_lin\_solve\_3raOp\_16$ & 246369.493 & 75 & 1750.180  & 203057.562 & 96 & 9578.348 \\ \hline
-
-$solver\_lin\_solve\_4taOp\_16$ & 211043.814 & 97 & 9477.334 &  149839.649 & 97 & 3777.415\\ \hline
-
+En este caso hemos variado los parámetros $a,b$ y $c$ solamente para tamaños de matriz 16x16 y 512x512. En la Figura 4 se muestran los promedios obtenidos para $1erOp$, $2daOp$, $3raOp$ y $4taOp$ sobre ambos tamaños. 
+Para tamaño 16x16 (Figura 4(a)) en caso $1erOp$ debemos aclarar que porcentaje de datos no outliers es del 49$\%$ pero 61$\%$ restante se reparte un 30$\%$ arriba y otro 30$\%$ abajo de los no outliers, y por lo tanto este 49$\%$ refleja el comportamiento de la mayoría de los datos. Por otra parte destacamos caso $2daOp$, donde se observa pobre ventaja de código ASM, de alrededor del 10$\%$, sobre código C mientras que en los otros casos se obtiene un porcentaje de ventaja a favor de ASM levemente mayor. El desvío estandar obtenido indica datos poco dispersos respecto a la media, y el porcentaje de datos promediados (no outliers) está arriba del 60$\%$ para tiempos ASM y C, salvo caso señalado antes. A causa de esto decidimos aceptar al promedio como representación de la mayoría de los datos. Se observa misma situación para 512x512 (Figura 4(b)) que para 16x16, con pobre ventaja para caso $2daOp$. A causa de esto hemos decidido evaluar la función usando $2daOp$ para todos los tamaños propuestos.
  
-\hline \hline 
+ \begin{figure}[htbp]
+\centering
 
+\subfigure[Promedios para tamaño 16x16.]{\includegraphics[width=70mm]{barplot_lin_solve_16_full_op}}
+\subfigure[Promedios para tamaño 512x512.]{\includegraphics[width=70mm]{barplot_lin_solve_512_full_op}}  
 
-$solver\_lin\_solve\_1erOp\_512$ &  2.345*e+08  & 83 & 4.538*e+06  & 1.627*e+08 & 76 & 2.517*e+06\\ \hline
+\caption{Promedios de tiempo de ejecución para función Solver Lin Solve sobre distintas implementaciones al variar parámetros sobre las cuatro opciones.} \label{fig:lego}
+\end{figure}
 
-$solver\_lin\_solve\_2daOp\_512$ & 2.546*e+08  & 70 & 2.528*e+06  & 2.153*e+08 & 89 &  2.895*e+06\\ \hline
-
-$solver\_lin\_solve\_3raOp\_512$ & 2.401*e+08 & 62 &  2.779*e+06 & 1.571*e+08 & 75 &  5.485*e+05\\ \hline
-
-$solver\_lin\_solve\_4taOp\_512$ & 2.326*e+08 & 80 & 2.384*e+06 &  1.586*e+08 & 86 & 1.889*e+06\\ \hline
-
-\end{tabular}
-\caption{Tabla de promedios ticks función Solver Lin Solve para tamaños 16x16 y 512x512. Valores con exponente fueron redondeados para mostrarse en tabla.}
-%\label{tabla:sencilla}
-\end{center}
-\end{table}
-Con estos parámetros variamos el tamaño de las matrices y graficamos los tiempos (ver Figura 3$(a)$).
+Con estos parámetros variamos el tamaño de las matrices y graficamos los tiempos (ver Figura 5$(a)$).
 %\begin{figure}[h]
 
 %\centering
-%\includegraphics[scale=0.6] {solver_lin_solve_0}
+%\includegraphics[scale=0.6] {barplot_lin_solve_512_full_op}
   
  %\caption{Tiempos en ticks de ejecución de código C vs código ASM para función solver lin solve y gcc en opción o0.}
 %\end{figure} 
