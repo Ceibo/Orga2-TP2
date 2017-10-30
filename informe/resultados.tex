@@ -97,8 +97,11 @@ La función $Solver Lin Solve$ presenta ínfima diferencia en tiempo de ejecuci�
 \subsection{Función Solver Project}
 
 \subsubsection{Compilación hecha con gcc en opción o0} 
-Se evalúan matrices con tamaño 16x16 y 512x512 sobre $1erOp$, $2daOp$, $3erOp$ y $4taOp$ para observar si hay gran cambio en las proporciones de tiempo al ejecutar código. Se observa en Figura 6 los resultados y se ve que para tamaño 16x16 implementación C tiende a gastar alrededor de 50$\%$ más de tiempo que código ASM.
-El desvío estandar obtenido indica que los datos se mantienen cercanos a la media y el porcentaje de no outliers queda arriba del 60$\%$. En caso 512x512 (Figura 6(b)) se observa que C también tiende a gastar arriba de 60$\%$ más del total que gasta ASM, aunque los tiempos se muestran similares para todos los casos. Suponemos esto a causa de los altos tiempos de ejecución, que para tamaño 16x16 eran bajos, y entonces no se diferencian entre un caso y otro. El porcentaje de datos y el desvío estandar indican comportamiento similar a caso 16x16, más del 60$\%$ no outliers y datos cercanos a la media. Esto nos da confianza de tomar al promedio podado como representante de datos.
+Evaluamos matrices de tamaño 16x16 y 512x512 sobre $1erOp$, $2daOp$, $3erOp$ y $4taOp$, con el objetivo de observar eventuales cambios en las proporciones de tiempo al ejecutar código. Podemos observar los resultados en la Figura 6, notando que para la muestra de tamaño 16x16, la implementación C tiende a insumir alrededor de un 50$\%$ más de tiempo que la implementación en ASM.
+El desvío estandar obtenido nos indica que los datos se mantienen cercanos a la media y que el porcentaje de no outliers es superior al 60$\%$. En caso de 512x512 (Figura 6(b)) se observa que C también tiende a insumirnos al menos un 60$\%$ más de tiempo respecto a la implementación en ASM, los tiempos se muestran similares para todos los casos.
+
+En nuestros experimentos con matrices de 16x16 los tiempos eran bajos y no notamos una gran diferencia entre los distintos casos.
+El porcentaje de datos y el desvío estandard dan cuenta de un comportamiento similar al caso de 16x16, con más del 60$\%$ de no outliers y datos cercanos a la media. Lueog, esto nos da argumentos para tomar la media podada como un buen estimador.
   
  \begin{figure}[htbp]
 \centering
@@ -145,5 +148,5 @@ No se nota mejora en tiempos respecto a la de $Solver Project$ y $gcc$ en $o1$ y
 \\
 
 
-La función $Solver Project$ presenta leve diferencia en tiempos de ejecución, implementación C tiende a tardar alrededor de un 50$\%$ más de tiempo que código ASM en nuestras mediciones. En este caso no se restringe el proceso múltiple de datos en la función y aprovechamos las funciones SIMD.
+La función $Solver Project$ presenta leve diferencia en tiempos de ejecución, sin embargo encontramos una diferencia de tiempos de ejecución lineal entre ambas implementaciones, tomando la implementación en C alrededor de un 50$\%$ más de tiempo que código ASM en nuestras mediciones. En este caso no se restringe el proceso múltiple de datos en la función y aprovechamos las funciones SIMD.
 

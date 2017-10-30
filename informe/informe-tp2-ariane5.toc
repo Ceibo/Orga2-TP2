@@ -1,20 +1,25 @@
 \select@language {spanish}
-\contentsline {section}{\numberline {1}Introducci\IeC {\'o}n}{2}
-\contentsline {section}{\numberline {2}Desarrollo}{2}
-\contentsline {subsection}{\numberline {2.1}Funci\IeC {\'o}n solver\_set\_bnd}{2}
-\contentsline {subsection}{\numberline {2.2}Funci\IeC {\'o}n solver\_lin\_solve}{3}
-\contentsline {subsection}{\numberline {2.3}Funci\IeC {\'o}n solver\_project}{5}
-\contentsline {section}{\numberline {3}Resultados}{7}
-\contentsline {subsection}{\numberline {3.1}Funci\IeC {\'o}n Solver Set Bnd }{7}
-\contentsline {subsubsection}{\numberline {3.1.1}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o0}{7}
-\contentsline {subsubsection}{\numberline {3.1.2}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o1}{7}
-\contentsline {subsubsection}{\numberline {3.1.3}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o3}{9}
-\contentsline {subsection}{\numberline {3.2}Funci\IeC {\'o}n Solver Lin Solve}{9}
-\contentsline {subsubsection}{\numberline {3.2.1}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o0}{9}
-\contentsline {subsubsection}{\numberline {3.2.2}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o1}{9}
-\contentsline {subsubsection}{\numberline {3.2.3}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o3}{11}
-\contentsline {subsection}{\numberline {3.3}Funci\IeC {\'o}n Solver Project}{11}
-\contentsline {subsubsection}{\numberline {3.3.1}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o0}{11}
-\contentsline {subsubsection}{\numberline {3.3.2}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o1}{11}
-\contentsline {subsubsection}{\numberline {3.3.3}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o3}{11}
-\contentsline {section}{\numberline {4}Conclusi\IeC {\'o}n}{13}
+\contentsline {section}{\numberline {1}Introducci\IeC {\'o}n}{2}{section.1}
+\contentsline {section}{\numberline {2}Desarrollo}{2}{section.2}
+\contentsline {subsection}{\numberline {2.1}Funci\IeC {\'o}n Solver Set Bnd}{2}{subsection.2.1}
+\contentsline {subsection}{\numberline {2.2}Funci\IeC {\'o}n Solver Lin Solve}{3}{subsection.2.2}
+\contentsline {subsection}{\numberline {2.3}Funci\IeC {\'o}n Solver Project}{5}{subsection.2.3}
+\contentsline {section}{\numberline {3}Experimentaci\IeC {\'o}n}{7}{section.3}
+\contentsline {subsection}{\numberline {3.1}Eficiencia C vs paralelismo simd ASM}{7}{subsection.3.1}
+\contentsline {subsubsection}{\numberline {3.1.1}Funci\IeC {\'o}n Solver Set Bound}{7}{subsubsection.3.1.1}
+\contentsline {subsubsection}{\numberline {3.1.2}Funci\IeC {\'o}n Solver Lin Solve}{7}{subsubsection.3.1.2}
+\contentsline {subsubsection}{\numberline {3.1.3}Funci\IeC {\'o}n Solver Project}{7}{subsubsection.3.1.3}
+\contentsline {section}{\numberline {4}Resultados}{8}{section.4}
+\contentsline {subsection}{\numberline {4.1}Funci\IeC {\'o}n Solver Set Bnd }{8}{subsection.4.1}
+\contentsline {subsubsection}{\numberline {4.1.1}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o0}{8}{subsubsection.4.1.1}
+\contentsline {subsubsection}{\numberline {4.1.2}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o1}{8}{subsubsection.4.1.2}
+\contentsline {subsubsection}{\numberline {4.1.3}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o3}{10}{subsubsection.4.1.3}
+\contentsline {subsection}{\numberline {4.2}Funci\IeC {\'o}n Solver Lin Solve}{10}{subsection.4.2}
+\contentsline {subsubsection}{\numberline {4.2.1}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o0}{10}{subsubsection.4.2.1}
+\contentsline {subsubsection}{\numberline {4.2.2}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o1}{12}{subsubsection.4.2.2}
+\contentsline {subsubsection}{\numberline {4.2.3}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o3}{12}{subsubsection.4.2.3}
+\contentsline {subsection}{\numberline {4.3}Funci\IeC {\'o}n Solver Project}{12}{subsection.4.3}
+\contentsline {subsubsection}{\numberline {4.3.1}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o0}{12}{subsubsection.4.3.1}
+\contentsline {subsubsection}{\numberline {4.3.2}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o1}{12}{subsubsection.4.3.2}
+\contentsline {subsubsection}{\numberline {4.3.3}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o3}{14}{subsubsection.4.3.3}
+\contentsline {section}{\numberline {5}Conclusi\IeC {\'o}n}{14}{section.5}
