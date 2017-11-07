@@ -1,0 +1,24 @@
+\BOOKMARK [1][-]{section.1}{Introducci\363n}{}% 1
+\BOOKMARK [1][-]{section.2}{Desarrollo}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Funci\363n Solver Set Bnd}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Funci\363n Solver Lin Solve}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Funci\363n Solver Project}{section.2}% 5
+\BOOKMARK [1][-]{section.3}{Experimentaci\363n}{}% 6
+\BOOKMARK [2][-]{subsection.3.1}{Eficiencia C vs paralelismo simd ASM}{section.3}% 7
+\BOOKMARK [3][-]{subsubsection.3.1.1}{Funci\363n Solver Set Bound}{subsection.3.1}% 8
+\BOOKMARK [3][-]{subsubsection.3.1.2}{Funci\363n Solver Lin Solve}{subsection.3.1}% 9
+\BOOKMARK [3][-]{subsubsection.3.1.3}{Funci\363n Solver Project}{subsection.3.1}% 10
+\BOOKMARK [1][-]{section.4}{Resultados}{}% 11
+\BOOKMARK [2][-]{subsection.4.1}{Funci\363n Solver Set Bnd }{section.4}% 12
+\BOOKMARK [3][-]{subsubsection.4.1.1}{Compilaci\363n hecha con gcc en opci\363n o0}{subsection.4.1}% 13
+\BOOKMARK [3][-]{subsubsection.4.1.2}{Compilaci\363n hecha con gcc en opci\363n o1}{subsection.4.1}% 14
+\BOOKMARK [3][-]{subsubsection.4.1.3}{Compilaci\363n hecha con gcc en opci\363n o3}{subsection.4.1}% 15
+\BOOKMARK [2][-]{subsection.4.2}{Funci\363n Solver Lin Solve}{section.4}% 16
+\BOOKMARK [3][-]{subsubsection.4.2.1}{Compilaci\363n hecha con gcc en opci\363n o0}{subsection.4.2}% 17
+\BOOKMARK [3][-]{subsubsection.4.2.2}{Compilaci\363n hecha con gcc en opci\363n o1}{subsection.4.2}% 18
+\BOOKMARK [3][-]{subsubsection.4.2.3}{Compilaci\363n hecha con gcc en opci\363n o3}{subsection.4.2}% 19
+\BOOKMARK [2][-]{subsection.4.3}{Funci\363n Solver Project}{section.4}% 20
+\BOOKMARK [3][-]{subsubsection.4.3.1}{Compilaci\363n hecha con gcc en opci\363n o0}{subsection.4.3}% 21
+\BOOKMARK [3][-]{subsubsection.4.3.2}{Compilaci\363n hecha con gcc en opci\363n o1}{subsection.4.3}% 22
+\BOOKMARK [3][-]{subsubsection.4.3.3}{Compilaci\363n hecha con gcc en opci\363n o3}{subsection.4.3}% 23
+\BOOKMARK [1][-]{section.5}{Conclusi\363n}{}% 24
