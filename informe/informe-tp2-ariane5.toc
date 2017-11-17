@@ -3,7 +3,7 @@
 \contentsline {section}{\numberline {2}Desarrollo}{2}{section.2}
 \contentsline {subsection}{\numberline {2.1}Funci\IeC {\'o}n Solver Set Bnd}{2}{subsection.2.1}
 \contentsline {subsection}{\numberline {2.2}Funci\IeC {\'o}n Solver Lin Solve}{3}{subsection.2.2}
-\contentsline {subsection}{\numberline {2.3}Funci\IeC {\'o}n Solver Project}{6}{subsection.2.3}
+\contentsline {subsection}{\numberline {2.3}Funci\IeC {\'o}n Solver Project}{5}{subsection.2.3}
 \contentsline {section}{\numberline {3}Experimentaci\IeC {\'o}n}{7}{section.3}
 \contentsline {subsection}{\numberline {3.1}Eficiencia C vs paralelismo simd ASM}{7}{subsection.3.1}
 \contentsline {subsubsection}{\numberline {3.1.1}Funci\IeC {\'o}n Solver Set Bound}{7}{subsubsection.3.1.1}
@@ -23,3 +23,5 @@
 \contentsline {subsubsection}{\numberline {4.3.2}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o1}{12}{subsubsection.4.3.2}
 \contentsline {subsubsection}{\numberline {4.3.3}Compilaci\IeC {\'o}n hecha con gcc en opci\IeC {\'o}n o3}{14}{subsubsection.4.3.3}
 \contentsline {section}{\numberline {5}Conclusi\IeC {\'o}n}{14}{section.5}
+\contentsline {subsection}{\numberline {5.1}Reflexi\IeC {\'o}n y problem\IeC {\'a}ticas encontradas}{14}{subsection.5.1}
+\contentsline {subsection}{\numberline {5.2}Conclusi\IeC {\'o}n de la experimentaci\IeC {\'o}n}{14}{subsection.5.2}
